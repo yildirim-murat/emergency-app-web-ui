@@ -1,0 +1,25 @@
+.numpad .row:not(:first-child), .col {
+    margin: 1px 2px;
+}
+
+.btn-success-subtle {
+    background-color: #d4edda;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: #fff;
+}
+
+/* Animasyon tanımı */
+@keyframes colorChange {
+    0% { background-color: #28a745; color: white }
+    25% { background-color: #72d088; color: gray}
+    50% { background-color: #d4edda; color:black}
+    75% { background-color: #72d088; color: gray}
+    100% { background-color: #28a745; color: white }
+}
+
+.btn-success-subtle {
+    animation: colorChange 1s infinite;
+}
