@@ -18,7 +18,7 @@ function Dashboard() {
     const newEventService = new NewEventService();
 
     useEffect(() => {
-        const ws = new WebSocket("ws://localhost:8001/ws");
+        const ws = new WebSocket("ws://167.172.105.199:8001/ws");
 
         ws.onopen = () => {
             console.log("WebSocket connection established.");
