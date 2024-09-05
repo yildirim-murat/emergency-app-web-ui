@@ -17,23 +17,8 @@ function Dashboard() {
     const [inCall, setInCall] = useState(false);
     const newEventService = new NewEventService();
 
-
-
-
-
-    // let process;
-    // const webSocketUrl = process.env.REACT_APP_WEBSOCKET_URL;
-    console.log("URL Adresi: " + import.meta.env.VITE_WEBSOCKET_URL);
-
     useEffect(() => {
-
-
-
-
-        // let process;
-        // const webSocketUrl = process.env.REACT_APP_WEBSOCKET_URL;
-        // console.log("URL Adresi: " + webSocketUrl);
-        const ws = new WebSocket("ws//localhost:8001/ws");
+        const ws = new WebSocket(import.meta.env.VITE_WEBSOCKET_URL);
 
         ws.onopen = () => {
             console.log("WebSocket connection established.");
