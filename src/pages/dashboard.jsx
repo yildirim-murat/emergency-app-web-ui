@@ -17,8 +17,11 @@ function Dashboard() {
     const [inCall, setInCall] = useState(false);
     const newEventService = new NewEventService();
 
+
     useEffect(() => {
-        const ws = new WebSocket("ws://localhost:8001/ws");
+        let process;
+        const webSocketUrl = process.env.REACT_APP_WEBSOCKET_URL;
+        const ws = new WebSocket(webSocketUrl);
 
         ws.onopen = () => {
             console.log("WebSocket connection established.");
@@ -114,15 +117,16 @@ function Dashboard() {
                         <div className="modal-header">
                             <h1 className="modal-title fs-5 user-select-none" id="callModal">Gelen Çağrı</h1>
                         </div>
-                        <div className="modal-body fs-4 text-center user-select-none nu-format" style={{fontWeight:"600"}}>
+                        <div className="modal-body fs-4 text-center user-select-none nu-format"
+                             style={{fontWeight: "600"}}>
                             {message.phone_number}
                         </div>
                         <div className="modal-footer">
                             <button type="button" ref={closeButtonRef} className="btn btn-outline-success w-100"
                                     data-bs-dismiss="modal"
                                     onClick={
-                                () => handleCloseModal()
-                            }
+                                        () => handleCloseModal()
+                                    }
                             >
                                 Cevapla
                             </button>
