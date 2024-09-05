@@ -16,6 +16,7 @@ function Dashboard() {
     const [showModal, setShowModal] = useState(false);
     const [inCall, setInCall] = useState(false);
     const newEventService = new NewEventService();
+    const audioRef = useRef(null);
 
     useEffect(() => {
         const ws = new WebSocket(import.meta.env.VITE_WEBSOCKET_URL);
@@ -53,8 +54,17 @@ function Dashboard() {
         setDataSetForStaff([...newEventService.generateDataForStaff(200)]);
     }, []);
 
+
     useEffect(() => {
+
+        audioRef.current = new Audio('/assets/sound/ring.wav');
+        const audio = audioRef.current;
+
         if (showModal) {
+            audio.play().catch(error => {
+                console.error("Error playing sound:", error);
+            });
+
             const modalInstance = new window.bootstrap.Modal(modalRef.current);
             modalInstance.show();
 
@@ -69,7 +79,12 @@ function Dashboard() {
 
             return () => {
                 window.removeEventListener('keydown', handleKeyDown);
+                audio.pause();
+                audio.currentTime = 0;
             };
+        } else {
+            audio.pause();
+            audio.currentTime = 0;
         }
     }, [showModal]);
 
