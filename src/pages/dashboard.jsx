@@ -18,10 +18,22 @@ function Dashboard() {
     const newEventService = new NewEventService();
 
 
+
+
+
+    // let process;
+    // const webSocketUrl = process.env.REACT_APP_WEBSOCKET_URL;
+    console.log("URL Adresi: " + import.meta.env.VITE_WEBSOCKET_URL);
+
     useEffect(() => {
-        let process;
-        const webSocketUrl = process.env.REACT_APP_WEBSOCKET_URL;
-        const ws = new WebSocket(webSocketUrl);
+
+
+
+
+        // let process;
+        // const webSocketUrl = process.env.REACT_APP_WEBSOCKET_URL;
+        // console.log("URL Adresi: " + webSocketUrl);
+        const ws = new WebSocket("ws//localhost:8001/ws");
 
         ws.onopen = () => {
             console.log("WebSocket connection established.");
@@ -55,7 +67,6 @@ function Dashboard() {
         setMissedCall([...newEventService.generateDataObject(15)]);
         setDataSetForStaff([...newEventService.generateDataForStaff(200)]);
     }, []);
-
 
     useEffect(() => {
         if (showModal) {
