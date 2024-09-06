@@ -36,32 +36,33 @@ function EventArea() {
             <nav>
                 <div className="nav nav-tabs" id="nav-tab" role="tablist">
                     {tabs.map((tab) => (
-                        <button
-                            key={tab.id}
-                            className={`nav-link ${tab.id === key ? 'active' : ''}`}
-                            id={`${tab.id}-tab`}
-                            data-bs-toggle="tab"
-                            data-bs-target={`#${tab.id}`}
-                            type="button"
-                            role="tab"
-                            aria-controls={tab.id}
-                            aria-selected={tab.id === key}
-                        >
-                            {tab.title}
-                            <Button
+                        <div key={tab.id} className="nav-item d-flex align-items-center mx-1">
+                            <button
+                                className={`nav-link ${tab.id === key ? 'active' : ''} px-3`}
+                                id={`${tab.id}-tab`}
+                                data-bs-toggle="tab"
+                                data-bs-target={`#${tab.id}`}
+                                type="button"
+                                role="tab"
+                                aria-controls={tab.id}
+                                aria-selected={tab.id === key}
+                            >
+                                {tab.title}
+                            </button>
+                            <button
                                 type="button"
                                 className="btn-close"
                                 aria-label="Close"
-                                style={{fontSize: "10px"}}
+                                style={{ fontSize: "10px", marginLeft:"-18px"}}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    removeTab(tab.id)
+                                    removeTab(tab.id);
                                 }}
                             />
-                        </button>
+                        </div>
                     ))}
                     <button
-                        className="nav-link"
+                        className="nav-link user-select-none"
                         id="new-tab-btn"
                         type="button"
                         onClick={() => addNewTab(dataSet)}

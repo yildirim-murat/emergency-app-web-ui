@@ -42,6 +42,8 @@ function Dashboard() {
             console.error("WebSocket error:", event);
         };
 
+        console.log("inCall değeri: " + inCall);
+
         return () => {
             ws.close();
             console.log("WebSocket connection closed.");
@@ -53,7 +55,6 @@ function Dashboard() {
         setMissedCall([...newEventService.generateDataObject(15)]);
         setDataSetForStaff([...newEventService.generateDataForStaff(200)]);
     }, []);
-
 
     useEffect(() => {
 
@@ -67,7 +68,7 @@ function Dashboard() {
 
             const modalInstance = new window.bootstrap.Modal(modalRef.current);
             modalInstance.show();
-
+            setAcceptData(false);
             const handleKeyDown = (event) => {
                 if (event.code === 'Space') {
                     event.preventDefault();
@@ -85,6 +86,7 @@ function Dashboard() {
         } else {
             audio.pause();
             audio.currentTime = 0;
+            // setAcceptData(true);
         }
     }, [showModal]);
 
@@ -105,7 +107,7 @@ function Dashboard() {
     return (
         <div>
             <Navbar/>
-            <InformationBar setSelectedOption={setAcceptData}/>
+            <InformationBar setSelectedOption={setAcceptData} inCall={inCall}/>
             <div className="d-flex row">
                 <div className="col-2" style={{minWidth: "300px", height: "85vh"}}>
                     <Aside calledNu={message.phone_number} callHistory={Array.isArray(callHistory) ? callHistory : []}

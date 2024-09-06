@@ -75,7 +75,7 @@ function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, ac
             <div className="row mt-2" style={{height: "26vh", overflow: "hidden"}}>
                 <div className="col overflow-y-auto overflow-x-hidden h-100">
                     <div className="row sticky-top bg-white">
-                        <div className="text-center"><h5>Operatörler</h5></div>
+                        <div className="text-center user-select-none"><h5>Operatörler</h5></div>
                         <input className="form-control text-center" list="departmentList" id="departmentDataList"
                                placeholder="Personel Birim Seçiniz" style={{fontSize: "8px"}}/>
                     </div>
@@ -147,7 +147,6 @@ function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, ac
                             </div>
                         )}
                     </div>
-
                 </div>
                 <div className="col overflow-auto h-100">
                     <div className="row sticky-top bg-white text-center user-select-none"><h5>Kurumlar</h5></div>

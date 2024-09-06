@@ -30,6 +30,7 @@ function Numpad({callNu, inCall, onCall, acceptData}) {
             setIsAnimating(prev => !prev);
         }, 500);
         setAnimationInterval(interval);
+        onCall(true)
     };
 
     const stopAnimation = () => {

@@ -8,6 +8,7 @@ import {GiCircleForest} from "react-icons/gi";
 import {TbRadioactiveFilled} from "react-icons/tb";
 import NewEventService from "../services/newEventService.js";
 import {FcHighPriority} from "react-icons/fc";
+import addressService from "../services/addressService.js";
 
 const MASKS = {
     Emniyet: 1,
@@ -22,12 +23,17 @@ function EventDetails({data, removeTab}) {
     const [selectedOption, setSelectedOption] = useState('');
     const [filter, setFilter] = useState('');
     const [selectedMask, setSelectedMask] = useState(0);
-    const [message, setMessage]=useState({title: "",content:""});
+    const [message, setMessage] = useState({title: "", content: ""});
     const eventService = new NewEventService();
     const caseDefinitions = eventService.caseDefinition();
     const modalRef = useRef(null);
     const closeButtonRef = useRef(null);
     const [showModal, setShowModal] = useState(false);
+    const [selectedCheckboxes, setSelectedCheckboxes] = useState({});
+    const [selectOption, setSelectOption] = useState("1");
+    const [province, setProvince] = useState([]);
+    const [district, setDistrict] = useState([]);
+    const [city, setCity]=useState("");
 
     useEffect(() => {
         window.addEventListener('keydown', handleF9Press);
@@ -56,26 +62,58 @@ function EventDetails({data, removeTab}) {
         }
     }, [showModal]);
 
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const result = await addressService.getProvince();
+                setProvince(result.data.data);
+            } catch (error) {
+                console.error("Veriler alınamadı: ", error);
+            }
+        };
+        fetchCities();
+    }, []);
+
+    useEffect(() => {
+        const fetchDistricts = async () => {
+            if(city.trim().length > 0){
+                try {
+                    const result = await addressService.getDistrict(city);
+                    setDistrict(result.data.data[0].districts);
+                }catch (err){
+                    console.log("Veriler alınamadı: " + err)
+                }
+            }
+        };
+        fetchDistricts()
+    }, [city]);
+
     const sendForm = () => {
+        const isAnySelected = Object.values(selectedCheckboxes).some((isChecked) => isChecked);
         setShowModal(true);
-        if (getSelectedLabels().length > 0) {
-            setMessage({title: "Başarılı",content:`Gönderildi: ${getSelectedLabels()}`
-        });
+
+        if (getSelectedLabels().length > 0 && isAnySelected) {
+            setMessage({
+                title: "Başarılı", content: `Gönderildi: ${getSelectedLabels()}`
+            });
             eventService.sendData("data");
             removeTab(selectedOption);
+        } else if (getSelectedLabels().length < 1 && !isAnySelected) {
+            setMessage({title: "Hata", content: "Lütfen Kurum ve Vaka Tanımı Seçiniz"});
+        } else if (!isAnySelected) {
+            setMessage({title: "Hata", content: "Lütfen Vaka Seçiniz"});
         } else {
-            setMessage({title: "Hata",content:"Lütfen Kurum Seçiniz"});
-    }}
-
+            setMessage({title: "Hata", content: "Lütfen Kurum Seçiniz"});
+        }
+    }
     const attributeCall = () => {
         setShowModal(true);
-        setMessage({title: "Başarılı",content:"İlişkilendirme Yapıldı"})
+        setMessage({title: "Başarılı", content: "İlişkilendirme Yapıldı"})
     }
     const endCall = () => {
         console.log("End call");
         removeTab();
     }
-
     const handleCheckboxChange = (event) => {
         const {id, checked} = event.target;
         const mask = MASKS[id];
@@ -86,6 +124,12 @@ function EventDetails({data, removeTab}) {
             setSelectedMask(prev => prev & ~mask);
         }
     };
+    const handleCheckList = (key) => {
+        setSelectedCheckboxes(prevState => ({
+            ...prevState,
+            [key]: !prevState[key]
+        }));
+    }
     const getSelectedLabels = () => {
         return Object.keys(MASKS).filter(key => (selectedMask & MASKS[key]) !== 0).join(', ');
     };
@@ -104,10 +148,14 @@ function EventDetails({data, removeTab}) {
     };
     const filteredDefinitions = Object.entries(caseDefinitions)
         .filter(([key, value]) => value.toLowerCase().includes(filter.toLowerCase()));
-
-    const handleCloseModal =()=>{
+    const handleCloseModal = () => {
         setShowModal(false);
     }
+
+    const handleCityChoose = (event) => {
+        setCity(event.target.value);
+    }
+
     return (
         <div className="row">
             <div className="row">
@@ -153,8 +201,9 @@ function EventDetails({data, removeTab}) {
                         <div className="col-3 text-center align-content-center">Haber Verme Şekli:</div>
                         <div className="col-5">
                             <select className="form-select" style={{fontSize: "10px"}}
-                                    aria-label="Default select example">
-                                <option selected value="1">Telefon</option>
+                                    aria-label="İletişim Şekli">
+                                <option value={selectOption} onChange={(e) => setSelectOption(e.target.value)}>Telefon
+                                </option>
                                 <option value="2">SMS</option>
                                 <option value="3">Acil</option>
                             </select>
@@ -273,8 +322,12 @@ function EventDetails({data, removeTab}) {
                                         <tr key={key}>
                                             <th>
                                                 <div className="form-check">
-                                                    <input className="form-check-input" type="checkbox" value={key}
-                                                           id={`checkbox-${key}`}/>
+                                                    <input className="form-check-input"
+                                                           type="checkbox"
+                                                           value={key}
+                                                           id={`checkbox-${key}`}
+                                                           onChange={() => handleCheckList(key)}
+                                                    />
                                                     <label className="form-check-label" htmlFor={`checkbox-${key}`}>
                                                         {value}
                                                     </label>
@@ -291,14 +344,12 @@ function EventDetails({data, removeTab}) {
                             <div className="row bg-danger-subtle justify-content-center pb-3"
                                  style={{position: "sticky", bottom: "0", zIndex: "10"}}>
                                 <div className="row w-50">
-                                    <input className="form-control mt-3" list="datalistOptions" id="exampleDataList"
-                                           placeholder="İl Seçiniz..."/>
-                                    <datalist id="datalistOptions">
-                                        <option value="San Francisco"/>
-                                        <option value="New York"/>
-                                        <option value="Seattle"/>
-                                        <option value="Los Angeles"/>
-                                        <option value="Chicago"/>
+                                    <input className="form-control mt-3" list="provinceDatalist" id="provinceDataInput"
+                                           placeholder="İl Seçiniz..." onBlur={handleCityChoose} defaultValue={"Ankara"}/>
+                                    <datalist id="provinceDatalist">
+                                        {province.length > 0 && province.map((city, index) => (
+                                                <option key={index} value={city.name}/>
+                                        ))}
                                     </datalist>
                                 </div>
                                 <div className="row h-100 fs-5 flex-wrap">
@@ -378,10 +429,9 @@ function EventDetails({data, removeTab}) {
                     </div>
                 </div>
                 <div className="col-3 ps-4">
-                    <Address/>
+                    <Address districts={district}/>
                 </div>
             </div>
-
             <div className="modal fade" ref={modalRef} id="staticEventModal" data-bs-backdrop="static"
                  data-bs-keyboard="false"
                  tabIndex="-1" aria-labelledby="eventModal" aria-hidden="true">
@@ -394,7 +444,7 @@ function EventDetails({data, removeTab}) {
                              style={{fontWeight: "600"}}>
 
                             {message.title === "Hata" ? (
-                                <><FcHighPriority size={"32px"} /> {message.content}</>
+                                <><FcHighPriority size={"32px"}/> {message.content}</>
                             ) : (
                                 <> {message.content}</>
                             )}
@@ -419,13 +469,13 @@ function EventDetails({data, removeTab}) {
 
 EventDetails.propTypes = {
     data: PropTypes.shape({
-        createId: PropTypes.string.isRequired,
+        createId: PropTypes.number.isRequired,
         createTime: PropTypes.string.isRequired,
         createDate: PropTypes.string.isRequired,
         callHistory: PropTypes.arrayOf(PropTypes.shape({
             callId: PropTypes.string.isRequired,
             number: PropTypes.string.isRequired,
-            callTime: PropTypes.string.isRequired,
+            callTime: PropTypes.number.isRequired,
             "lat-lot": PropTypes.string.isRequired,
             "call-location": PropTypes.string.isRequired,
             "call-attribution": PropTypes.bool.isRequired

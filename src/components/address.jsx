@@ -1,10 +1,9 @@
 import {useEffect, useState} from "react";
+import PropTypes from "prop-types";
 
-function Address() {
-
+function Address({districts}) {
     const [charCount, setCharCount] = useState(1024);
     const [addressCharCount, setAddressCharCount] = useState(1024);
-
     useEffect(() => {
         const textAreaCase = document.getElementById('caseDescription');
         const charCountLabel = document.getElementById('charCountLabelCase');
@@ -24,7 +23,6 @@ function Address() {
             textAreaCase.removeEventListener('input', updateCharCount);
         };
     }, []);
-
     useEffect(() => {
         const textAreaAddress = document.getElementById('addressDescription');
         const charCountLabelAddress = document.getElementById('charCountLabelAddress');
@@ -44,19 +42,17 @@ function Address() {
         };
     }, []);
 
+    const districtList = Array.isArray(districts) ? districts : [];
+
     return (
         <div className="d-grid p-0">
             <div className="row p-0">
                 <div className="row bg-info-subtle ps-3">Adres ve POI Arama</div>
                 <div className="row">
-                    <input className="form-control mt-2 p-0" list="datalistOptions" id="exampleDataList"
+                    <input className="form-control mt-2 p-0" list="poiList" id="poiDataList"
                            placeholder="Type to search..."/>
-                    <datalist id="datalistOptions">
-                        <option value="San Francisco"/>
-                        <option value="New York"/>
-                        <option value="Seattle"/>
-                        <option value="Los Angeles"/>
-                        <option value="Chicago"/>
+                    <datalist id="poiList">
+
                     </datalist>
                 </div>
             </div>
@@ -71,15 +67,13 @@ function Address() {
                                 style={{width: "280px"}}
                                 list="datalistOptionsIlce"
                                 id="inputIlce"
-                                placeholder="Type to search..."
+                                placeholder="İlçe Giriniz..."
                             />
                         </div>
                         <datalist id="datalistOptionsIlce">
-                            <option value="San Francisco"/>
-                            <option value="New York"/>
-                            <option value="Seattle"/>
-                            <option value="Los Angeles"/>
-                            <option value="Chicago"/>
+                            {districtList.length > 0 && districtList.map((dist) => (
+                                <option key={dist.id} value={dist.name}/>
+                            ))}
                         </datalist>
 
                         <div className="d-flex justify-content-between align-items-center">
@@ -205,6 +199,10 @@ function Address() {
             </div>
         </div>
     );
+}
+
+Address.propTypes = {
+    districts: PropTypes.array
 }
 
 export default Address;

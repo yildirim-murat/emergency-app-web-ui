@@ -4,7 +4,7 @@ import {MdOutlineLooksTwo, MdOutlineRecordVoiceOver} from "react-icons/md";
 import {useEffect, useState} from "react";
 import PropTypes from "prop-types";
 
-function InformationBar({setSelectedOption}) {
+function InformationBar({setSelectedOption, inCall}) {
     const [textAvailable, setTextAvailable] = useState("Uygun");
     const [textExemption, setTextExemption] = useState("Çağrı Muafiyeti");
     const [textBreak, setTextBreak] = useState("Mola");
@@ -67,7 +67,7 @@ function InformationBar({setSelectedOption}) {
                         <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="secondNavbarSupportedContent">
-                        <div className="row align-items-center w-100 h-100 user-select-none">
+                        <div className="row align-items-center w-100 h-100 user-select-none" >
                             <div className="col-lg-3">
                                 <div className="btn-group" role="group"
                                      aria-label="Basic radio toggle button group">
@@ -79,14 +79,14 @@ function InformationBar({setSelectedOption}) {
                                     </label>
 
                                     <input type="radio" className="btn-check" name="btnradio" id="btnexemption"
-                                           autoComplete="off" onClick={changeTextExemption} defaultChecked/>
+                                           autoComplete="off" disabled={inCall} onClick={changeTextExemption} defaultChecked/>
                                     <label className="btn btn-outline-secondary"
                                            htmlFor="btnexemption"><HiPhoneMissedCall size={"1.5rem"}/>
                                         {textExemption}
                                     </label>
 
                                     <input type="radio" className="btn-check" name="btnradio" id="btnbreak"
-                                           autoComplete="off" onClick={changeTextBreak}/>
+                                           autoComplete="off" disabled={inCall} onClick={changeTextBreak}/>
                                     <label className="btn btn-outline-danger" htmlFor="btnbreak"><TbCoffee
                                         size={"1.5rem"}/>{textBreak}</label>
                                 </div>
@@ -130,7 +130,8 @@ function InformationBar({setSelectedOption}) {
 }
 
 InformationBar.propTypes = {
-    setSelectedOption: PropTypes.func.isRequired
+    setSelectedOption: PropTypes.func.isRequired,
+    inCall: PropTypes.bool.isRequired,
 }
 
 export default InformationBar;
