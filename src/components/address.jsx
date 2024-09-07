@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 function Address({districts}) {
     const [charCount, setCharCount] = useState(1024);
     const [addressCharCount, setAddressCharCount] = useState(1024);
+
     useEffect(() => {
         const textAreaCase = document.getElementById('caseDescription');
         const charCountLabel = document.getElementById('charCountLabelCase');
@@ -23,6 +24,7 @@ function Address({districts}) {
             textAreaCase.removeEventListener('input', updateCharCount);
         };
     }, []);
+
     useEffect(() => {
         const textAreaAddress = document.getElementById('addressDescription');
         const charCountLabelAddress = document.getElementById('charCountLabelAddress');
@@ -173,7 +175,10 @@ function Address({districts}) {
                     </div>
                 </div>
                 <div className="row">
-                    <div className="btn btn-danger" onClick={()=> document.getElementById("addressDescription").value = ""}>Konum Detaylarını Temizle</div>
+                    <div className="btn btn-danger" onClick={()=> {
+                        document.getElementById("addressDescription").value = "";
+                        document.getElementById('charCountLabelAddress').textContent = "1024/1024"
+                    }}>Konum Detaylarını Temizle</div>
                 </div>
             </div>
             <div className="row">
