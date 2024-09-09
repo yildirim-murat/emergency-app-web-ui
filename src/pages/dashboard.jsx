@@ -17,37 +17,64 @@ function Dashboard() {
     const [inCall, setInCall] = useState(false);
     const newEventService = new NewEventService();
     const audioRef = useRef(null);
+    const audioVoiceRef = useRef(null);
+    const [isConnected, setIsConnected] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {
-        const ws = new WebSocket(import.meta.env.VITE_WEBSOCKET_URL);
+        let ws;
 
-        ws.onopen = () => {
+        const handleWebSocketOpen = () => {
             console.log("WebSocket connection established.");
-            ws.send("Connected");
+            ws.send("Connected: myIp&myMacAddress");
+            setIsConnected(true);
         };
 
-        if (acceptData && !inCall) {
+        const handleWebSocketError = (e) => {
+            console.error("WebSocket error: ", e);
+            setIsConnected(false);
+            setInCall(false);
+            ws.close();
+        };
+
+        const handleWebSocketClose = () => {
+            console.log("WebSocket connection closed.");
+            setIsConnected(false);
+        };
+
+        if (acceptData) {
+            ws = new WebSocket("ws://"+ import.meta.env.VITE_WEBSOCKET_URL +"/call-info");
+
+            ws.onopen = handleWebSocketOpen;
+            ws.onerror = handleWebSocketError;
             ws.onmessage = (event) => {
-                try {
-                    const parsedMessage = JSON.parse(event.data);
-                    setMessage(parsedMessage);
-                    setShowModal(true)
-                } catch (error) {
-                    console.log("Message parsing error: " + error);
+                if (acceptData && !inCall) {
+                    try {
+                        const parsedMessage = JSON.parse(event.data);
+                        setMessage(parsedMessage);
+                        setShowModal(true);
+                    } catch (error) {
+                        console.log("Message parsing error: " + error);
+                    }
                 }
             };
+
+            if (!acceptData) {
+                ws.onclose = handleWebSocketClose;
+            }
+
+            return () => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.close();
+                    console.log("WebSocket connection closed due to unmount.");
+                }
+            };
+        } else {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.close();
+                console.log("WebSocket connection closed due to state change.");
+            }
         }
-
-        ws.onerror = (event) => {
-            console.error("WebSocket error:", event);
-        };
-
-        console.log("inCall değeri: " + inCall);
-
-        return () => {
-            ws.close();
-            console.log("WebSocket connection closed.");
-        };
     }, [acceptData, inCall]);
 
     useEffect(() => {
@@ -57,10 +84,8 @@ function Dashboard() {
     }, []);
 
     useEffect(() => {
-
         audioRef.current = new Audio('/assets/sound/ring.wav');
         const audio = audioRef.current;
-
         if (showModal) {
             audio.play().catch(error => {
                 console.error("Error playing sound:", error);
@@ -86,7 +111,6 @@ function Dashboard() {
         } else {
             audio.pause();
             audio.currentTime = 0;
-            // setAcceptData(true);
         }
     }, [showModal]);
 
@@ -94,7 +118,30 @@ function Dashboard() {
         setShowModal(false);
         setInCall(true);
         setAcceptData(false);
+        setIsPlaying(true);
     }
+
+    const isPlayingHandle = (value) => {
+        setIsPlaying(value);
+    }
+
+    useEffect(() => {
+        if (!audioVoiceRef.current) {
+            audioVoiceRef.current = new Audio("http://" + import.meta.env.VITE_WEBSOCKET_URL + "/audio");
+        }
+        const audio = audioVoiceRef.current;
+
+        if (isPlaying && audio) {
+            audio.play().catch(error => {console.error("Error playing voice:", error);});
+            setIsPlaying(true);
+            audio.onended = () => setIsPlaying(false);
+
+            return () => {
+                audio.pause();
+                audio.currentTime = 0;
+            };
+        }
+    }, [isPlaying])
 
     const onCall = (value) => {
         setInCall(value);
@@ -107,7 +154,7 @@ function Dashboard() {
     return (
         <div>
             <Navbar/>
-            <InformationBar setSelectedOption={setAcceptData} inCall={inCall}/>
+            <InformationBar setSelectedOption={setAcceptData} inCall={inCall} setIsConnected={setIsConnected}/>
             <div className="d-flex row">
                 <div className="col-2" style={{minWidth: "300px", height: "85vh"}}>
                     <Aside calledNu={message.phone_number} callHistory={Array.isArray(callHistory) ? callHistory : []}
@@ -116,6 +163,8 @@ function Dashboard() {
                            inCall={inCall}
                            onCall={onCall}
                            acceptData={handleAcceptData}
+                           voice={isPlayingHandle}
+                           isConnected={isConnected}
                     />
                 </div>
                 <div className="col-10" style={{height: "87vh"}}>

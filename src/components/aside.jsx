@@ -8,13 +8,14 @@ import {TbRadioactiveFilled} from "react-icons/tb";
 import {VscCallOutgoing} from "react-icons/vsc";
 import PropTypes from "prop-types";
 
-function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, acceptData}) {
+function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, acceptData, voice}) {
 
     const call = () => {
         return calledNu !== null ? String(calledNu) : "0";
     }
 
     const publishDepartment = (event) => {
+        voice(false)
         const label = event.currentTarget.querySelector('.transferredFrom').innerText;
         console.log(label + " birimine " + calledNu + " numaralı ihbarcıya ait vaka bilgileri gönderildi.");
         onCall(false);
@@ -39,7 +40,7 @@ function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, ac
                 <div className="tab-content" id="nav-tabContent">
                     <div className="tab-pane fade show active" id="nav-phone" role="tabpanel"
                          aria-labelledby="nav-phone-tab" tabIndex="0">
-                        <Numpad callNu={call()} inCall={inCall} onCall={onCall} acceptData={acceptData} />
+                        <Numpad callNu={call()} inCall={inCall} onCall={onCall} acceptData={acceptData} voice={voice} />
                     </div>
                     <div className="tab-pane fade" id="nav-off-time" role="tabpanel" aria-labelledby="nav-off-time-tab"
                          tabIndex="0">Mola Süreleri
@@ -233,7 +234,8 @@ Aside.propTypes = {
     staffData: PropTypes.array.isRequired,
     inCall: PropTypes.bool.isRequired,
     onCall: PropTypes.func,
-    acceptData: PropTypes.func
+    acceptData: PropTypes.func,
+    voice: PropTypes.func.isRequired
 }
 
 export default Aside;

@@ -4,7 +4,7 @@ import {VscCallOutgoing} from "react-icons/vsc";
 import {MdCallEnd} from "react-icons/md";
 import PropTypes from "prop-types";
 
-function Numpad({callNu, inCall, onCall, acceptData}) {
+function Numpad({callNu, inCall, onCall, acceptData, voice}) {
     const [value, setValue] = useState("0");
     const [animationInterval, setAnimationInterval] = useState(null);
     const [isAnimating, setIsAnimating] = useState(false);
@@ -40,6 +40,7 @@ function Numpad({callNu, inCall, onCall, acceptData}) {
         }
         setIsAnimating(false);
         onCall(false);
+        voice(false);
     };
 
     const handleKeyDown = (e) => {
@@ -161,7 +162,8 @@ Numpad.propTypes = {
     callNu: PropTypes.string.isRequired,
     inCall: PropTypes.bool.isRequired,
     onCall: PropTypes.func,
-    acceptData: PropTypes.func
+    acceptData: PropTypes.func,
+    voice: PropTypes.func.isRequired
 }
 
 export default Numpad;

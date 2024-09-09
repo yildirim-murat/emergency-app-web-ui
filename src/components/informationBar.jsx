@@ -4,7 +4,7 @@ import {MdOutlineLooksTwo, MdOutlineRecordVoiceOver} from "react-icons/md";
 import {useEffect, useState} from "react";
 import PropTypes from "prop-types";
 
-function InformationBar({setSelectedOption, inCall}) {
+function InformationBar({setSelectedOption, inCall, setIsConnected}) {
     const [textAvailable, setTextAvailable] = useState("Uygun");
     const [textExemption, setTextExemption] = useState("Çağrı Muafiyeti");
     const [textBreak, setTextBreak] = useState("Mola");
@@ -26,6 +26,7 @@ function InformationBar({setSelectedOption, inCall}) {
         setTextAvailable(`Uygun - ${formatTime(now)}`)
         setTextBreak("Mola")
         setSelectedOption(true);
+        setIsConnected(true)
     };
 
     const changeTextExemption = () => {
@@ -34,6 +35,7 @@ function InformationBar({setSelectedOption, inCall}) {
         setTextAvailable("Uygun")
         setTextBreak("Mola")
         setSelectedOption(false);
+        setIsConnected(false)
     };
 
     const changeTextBreak = () => {
@@ -42,6 +44,7 @@ function InformationBar({setSelectedOption, inCall}) {
         setTextAvailable("Uygun")
         setTextBreak(`Mola - ${formatTime(now)}`)
         setSelectedOption(false);
+        setIsConnected(false)
     };
 
     const openSiteSecondScreen = () => {
@@ -56,7 +59,6 @@ function InformationBar({setSelectedOption, inCall}) {
         window.open("https://ista-wld.ng112.gov.tr", "_blank");
     }
 
-
     return (
         <>
             <nav className="navbar navbar-expand-lg bg-info-subtle">
@@ -67,7 +69,7 @@ function InformationBar({setSelectedOption, inCall}) {
                         <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="secondNavbarSupportedContent">
-                        <div className="row align-items-center w-100 h-100 user-select-none" >
+                        <div className="row align-items-center w-100 h-100 user-select-none">
                             <div className="col-lg-3">
                                 <div className="btn-group" role="group"
                                      aria-label="Basic radio toggle button group">
@@ -79,7 +81,8 @@ function InformationBar({setSelectedOption, inCall}) {
                                     </label>
 
                                     <input type="radio" className="btn-check" name="btnradio" id="btnexemption"
-                                           autoComplete="off" disabled={inCall} onClick={changeTextExemption} defaultChecked/>
+                                           autoComplete="off" disabled={inCall} onClick={changeTextExemption}
+                                           defaultChecked/>
                                     <label className="btn btn-outline-secondary"
                                            htmlFor="btnexemption"><HiPhoneMissedCall size={"1.5rem"}/>
                                         {textExemption}
@@ -109,7 +112,7 @@ function InformationBar({setSelectedOption, inCall}) {
                             </div>
                             <div className="col-lg-1">
                                 <span className="col pt-2">
-                                    <div style={{color: "green", fontWeight: "bold"}}>Sokete Bağlı</div>
+                                    <div style={{color: "green",fontWeight: "bold"}}>Sokete Bağlı</div>
                                 </span>
                             </div>
                             <div className="col-lg-2"><span className={"d-inline-block text-truncate"}
@@ -132,6 +135,7 @@ function InformationBar({setSelectedOption, inCall}) {
 InformationBar.propTypes = {
     setSelectedOption: PropTypes.func.isRequired,
     inCall: PropTypes.bool.isRequired,
+    setIsConnected: PropTypes.func.isRequired
 }
 
 export default InformationBar;
