@@ -2,3 +2,12 @@
     font-family: "JetBrains Mono", system-ui;
     font-optical-sizing: auto
 }
+
+.accordion-button.no-icon::after {
+    display: none;
+}
+
+
+.border-test{
+    border: 1px solid black;
+}

@@ -4,7 +4,6 @@ function MainPage() {
 
     return (
         <>
-            {/*Login Page*/}
             <Dashboard/>
         </>
     );

@@ -43,7 +43,7 @@ function Dashboard() {
         };
 
         if (acceptData) {
-            ws = new WebSocket("ws://"+ import.meta.env.VITE_WEBSOCKET_URL +"/call-info");
+            ws = new WebSocket("ws://" + import.meta.env.VITE_WEBSOCKET_URL + "/call-info");
 
             ws.onopen = handleWebSocketOpen;
             ws.onerror = handleWebSocketError;
@@ -132,7 +132,9 @@ function Dashboard() {
         const audio = audioVoiceRef.current;
 
         if (isPlaying && audio) {
-            audio.play().catch(error => {console.error("Error playing voice:", error);});
+            audio.play().catch(error => {
+                console.error("Error playing voice:", error);
+            });
             setIsPlaying(true);
             audio.onended = () => setIsPlaying(false);
 
@@ -167,7 +169,7 @@ function Dashboard() {
                            isConnected={isConnected}
                     />
                 </div>
-                <div className="col-10" style={{height: "87vh"}}>
+                <div className="col-10 p-0 m-0" style={{height: "87vh"}}>
                     <EventArea/>
                 </div>
             </div>

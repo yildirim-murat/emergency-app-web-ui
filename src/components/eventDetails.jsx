@@ -1,31 +1,18 @@
 import {useEffect, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
-import Address from "./address.jsx";
-import {MdLocalPolice, MdOutlineFireTruck} from "react-icons/md";
-import {RiPoliceBadgeLine} from "react-icons/ri";
-import {LiaAmbulanceSolid} from "react-icons/lia";
-import {GiCircleForest} from "react-icons/gi";
-import {TbRadioactiveFilled} from "react-icons/tb";
 import NewEventService from "../services/newEventService.js";
-import {FcHighPriority} from "react-icons/fc";
-import addressService from "../services/addressService.js";
-
-const MASKS = {
-    Emniyet: 1,
-    Sağlık: 2,
-    Jandarma: 4,
-    İtfaiye: 8,
-    Orman: 16,
-    Afad: 32
-};
+import CallLogs from "./callLogs.jsx";
+import AccordionRow from "./accordionRow.jsx";
+import Address from "./address.jsx";
+import Priority from "./priority.jsx";
+import Department from "./department.jsx";
 
 function EventDetails({data, removeTab}) {
     const [selectedOption, setSelectedOption] = useState('');
     const [filter, setFilter] = useState('');
-    const [selectedMask, setSelectedMask] = useState(0);
     const [message, setMessage] = useState({title: "", content: ""});
     const eventService = new NewEventService();
-    const caseDefinitions = eventService.caseDefinition();
+    const [caseDefinitions, setCaseDefinitions] = useState([]);
     const modalRef = useRef(null);
     const closeButtonRef = useRef(null);
     const [showModal, setShowModal] = useState(false);
@@ -33,7 +20,15 @@ function EventDetails({data, removeTab}) {
     const [selectOption, setSelectOption] = useState("1");
     const [province, setProvince] = useState([]);
     const [district, setDistrict] = useState([]);
-    const [city, setCity]=useState("");
+    const [city, setCity] = useState("");
+    const [incidents, setIncidents] = useState();
+    const [incidentsList, setIncidentsList] = useState([]);
+    const [keyList, setKeyList] = useState([])
+    const [searchTerm, setSearchTerm] = useState('');
+    const [triggerUpdate, setTriggerUpdate] = useState(false);
+    const [selectedHeaders, setSelectedHeaders] = useState([]);
+    const [selectedSubItems, setSelectedSubItems] = useState({});
+    const [selectedDepartments, setSelectedDepartments] = useState('');
 
     useEffect(() => {
         window.addEventListener('keydown', handleF9Press);
@@ -43,9 +38,13 @@ function EventDetails({data, removeTab}) {
     }, []);
 
     useEffect(() => {
-        if (showModal) {
+        if (showModal && modalRef.current) {
             const modalInstance = new window.bootstrap.Modal(modalRef.current);
             modalInstance.show();
+
+            modalInstance.handleHide = () => {
+                setShowModal(false);
+            };
 
             const handleKeyDown = (event) => {
                 if (event.code === 'Space') {
@@ -53,59 +52,115 @@ function EventDetails({data, removeTab}) {
                     closeButtonRef.current.click();
                 }
             };
-
             window.addEventListener('keydown', handleKeyDown);
-
             return () => {
+                modalInstance.hide();
                 window.removeEventListener('keydown', handleKeyDown);
+                setShowModal(false);
             };
         }
     }, [showModal]);
 
     useEffect(() => {
-        const fetchCities = async () => {
+        const fetchData = async () => {
             try {
-                const result = await addressService.getProvince();
-                setProvince(result.data.data);
+                return await NewEventService.getAddress.getProvince();
             } catch (error) {
-                console.error("Veriler alınamadı: ", error);
+                console.error(error);
+                throw error;
             }
         };
-        fetchCities();
+        fetchData()
+            .then(response => {
+                setProvince(response.data);
+                setCity("ANKARA");
+            })
+            .catch(error => {
+                console.error("Veri çekilirken hata oluştu:", error);
+            });
+
+        const fetchIncidents = async () => {
+            try {
+                return await NewEventService.getIncidents.getData();
+            } catch (e) {
+                console.error(e)
+            }
+        }
+        fetchIncidents().then(res => setIncidents(res)).catch((error) => console.error(error));
+
+
     }, []);
 
     useEffect(() => {
-        const fetchDistricts = async () => {
-            if(city.trim().length > 0){
+        if (city.trim().length > 0) {
+            const fetchDistricts = async () => {
                 try {
-                    const result = await addressService.getDistrict(city);
-                    setDistrict(result.data.data[0].districts);
-                }catch (err){
-                    console.log("Veriler alınamadı: " + err)
+                    return await NewEventService.getAddress.getDistrict(city);
+                } catch (error) {
+                    console.error(error);
+                    throw error;
                 }
             }
-        };
-        fetchDistricts()
+            fetchDistricts()
+                .then(response => setDistrict(response.data))
+                .catch(error => console.error("Veri çekilirken hata oluştu:(District)", error));
+        }
     }, [city]);
 
-    const sendForm = () => {
-        const isAnySelected = Object.values(selectedCheckboxes).some((isChecked) => isChecked);
-        setShowModal(true);
+    useEffect(() => {
+        if (incidentsList.length > 0) {
+            const uniqueKeys = new Set();
 
-        if (getSelectedLabels().length > 0 && isAnySelected) {
-            setMessage({
-                title: "Başarılı", content: `Gönderildi: ${getSelectedLabels()}`
-            });
-            eventService.sendData("data");
-            removeTab(selectedOption);
-        } else if (getSelectedLabels().length < 1 && !isAnySelected) {
-            setMessage({title: "Hata", content: "Lütfen Kurum ve Vaka Tanımı Seçiniz"});
-        } else if (!isAnySelected) {
-            setMessage({title: "Hata", content: "Lütfen Vaka Seçiniz"});
-        } else {
-            setMessage({title: "Hata", content: "Lütfen Kurum Seçiniz"});
+            incidentsList.forEach(item => {
+                    Object.keys(item).forEach(key => {
+                        uniqueKeys.add(key)
+                    })
+                }
+            )
+            setKeyList(Array.from(uniqueKeys));
         }
-    }
+
+    }, [incidentsList]);
+
+    // useEffect(() => {
+    //         const fetchNeighborhood = async () => {
+    //             console.log(district);
+    //             if (arrayOf(district).length > 0) {
+    //                 try {
+    //                     return await NewEventService.getAddress.getNeighborhoods(province, district);
+    //                 } catch (error) {
+    //                     console.error(error);
+    //                     throw error;
+    //                 }
+    //             }
+    //         }
+    //     fetchNeighborhood()
+    //         .then(response => setNeighborhoods(response.data))
+    //         .catch(error => console.error("Veri çekilirken hata oluştu:(Neigh)", error));
+    // }, [district]);
+
+    const handleDepartmentSelectionChange = (selected) => {
+        setSelectedDepartments(selected);
+    };
+
+    const sendForm = () => {
+        if (selectedHeaders.length > 0 && selectedDepartments.length > 0) {
+            eventService.sendData("data");
+            removeTab();
+        } else {
+            let errorMessage;
+            if (selectedHeaders.length < 1 && selectedDepartments.length < 1) {
+                errorMessage = `Lütfen Kurum ve Vaka Tanımı Seçiniz!..`;
+            } else if (selectedHeaders.length < 1) {
+                errorMessage = "Lütfen Vaka Seçiniz";
+            } else if (selectedDepartments.length < 1) {
+                errorMessage = "Lütfen Kurum Seçiniz";
+            }
+
+            setMessage({title: "Hata", content: errorMessage});
+            setShowModal(true);
+        }
+    };
     const attributeCall = () => {
         setShowModal(true);
         setMessage({title: "Başarılı", content: "İlişkilendirme Yapıldı"})
@@ -114,25 +169,7 @@ function EventDetails({data, removeTab}) {
         console.log("End call");
         removeTab();
     }
-    const handleCheckboxChange = (event) => {
-        const {id, checked} = event.target;
-        const mask = MASKS[id];
 
-        if (checked) {
-            setSelectedMask(prev => prev | mask);
-        } else {
-            setSelectedMask(prev => prev & ~mask);
-        }
-    };
-    const handleCheckList = (key) => {
-        setSelectedCheckboxes(prevState => ({
-            ...prevState,
-            [key]: !prevState[key]
-        }));
-    }
-    const getSelectedLabels = () => {
-        return Object.keys(MASKS).filter(key => (selectedMask & MASKS[key]) !== 0).join(', ');
-    };
     const handleF9Press = (event) => {
         if (event.key === 'F9') {
             const endCallButton = document.getElementById('endCall');
@@ -141,23 +178,82 @@ function EventDetails({data, removeTab}) {
             }
         }
     };
+
     const handleOptionChange = (e) => {
         const value = e.target.value;
         setSelectedOption(value);
         setFilter(value);
     };
-    const filteredDefinitions = Object.entries(caseDefinitions)
-        .filter(([key, value]) => value.toLowerCase().includes(filter.toLowerCase()));
+// const filteredDefinitions = Object.entries(caseDefinitions)
+//     .filter(([key, value]) => value.toLowerCase().includes(filter.toLowerCase()));
+
     const handleCloseModal = () => {
         setShowModal(false);
+        setMessage({title: "", content: ""});
     }
 
     const handleCityChoose = (event) => {
         setCity(event.target.value);
     }
 
+    useEffect(() => {
+        if (incidents) {
+            Object.values(incidents).forEach(value => {
+                if (Array.isArray(value)) {
+                    // setIncidentsList(JSON.stringify(value))
+                    setIncidentsList(value)
+                }
+            });
+        }
+    }, [incidents]);
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value.toUpperCase());
+    }
+
+    const filteredList = keyList.filter(item =>
+        item.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleHeaderSelect = (header, isSelected) => {
+        setSelectedHeaders(prev =>
+            isSelected ? [...prev, header] : prev.filter(h => h !== header)
+        );
+
+        if (!isSelected) {
+            setSelectedSubItems(prev => {
+                const updated = {...prev};
+                delete updated[header];
+                return updated;
+            });
+        }
+    };
+
+    const handleSubItemSelect = (header, subItem, isSelected) => {
+        setSelectedSubItems(prev => {
+            const updated = {...prev};
+
+            if (isSelected) {
+                if (!updated[header]) {
+                    updated[header] = [subItem];
+                } else if (!updated[header].includes(subItem)) {
+                    updated[header].push(subItem);
+                }
+            } else {
+                updated[header] = updated[header].filter(item => item !== subItem);
+                if (updated[header].length === 0) delete updated[header];
+            }
+
+            return updated;
+        });
+
+        if (isSelected && !selectedHeaders.includes(header)) {
+            handleHeaderSelect(header, true);
+        }
+    };
+
     return (
-        <div className="row">
+        <div className="row overflow-hidden m-0" style={{height: "79vh", width: "83vw"}}>
             <div className="row">
                 <div className="col d-flex justify-content-evenly">
                     <button className="btn btn-outline-success" onClick={sendForm}>Yayınla
@@ -177,115 +273,21 @@ function EventDetails({data, removeTab}) {
                                 className="row justify-content-center bg-info-subtle h-50 fs-5 align-items-center rounded">{data.createId}
                             </div>
                         </div>
-                        <div className="col-3">
+                        <div className="col-3 mx-1">
                             <div className="row bg-info justify-content-center rounded">Saat</div>
                             <div
                                 className="row justify-content-center bg-info-subtle h-50 fs-5 align-items-center rounded">{data.createTime}
                             </div>
                         </div>
                         <div className="col-3">
-                            <div className="row bg-info justify-content-center">Tarih</div>
+                            <div className="row bg-info justify-content-center rounded">Tarih</div>
                             <div
                                 className="row justify-content-center bg-info-subtle h-50 fs-5 align-items-center rounded">{data.createDate}</div>
                         </div>
-                        <div className="col-3">
-                            <div className="form-check form-switch">
-                                <input className="form-check-input" type="checkbox" role="switch"
-                                       id="flexSwitchCheckDefault"/>
-                                <label className="form-check-label user-select-none"
-                                       htmlFor="flexSwitchCheckDefault">Öncelikli Vaka mı?</label>
-                            </div>
-                        </div>
+                        <Priority/>
                     </div>
-                    <div className="row" style={{height: "40px"}}>
-                        <div className="col-3 text-center align-content-center">Haber Verme Şekli:</div>
-                        <div className="col-5">
-                            <select className="form-select" style={{fontSize: "10px"}}
-                                    aria-label="İletişim Şekli">
-                                <option value={selectOption} onChange={(e) => setSelectOption(e.target.value)}>Telefon
-                                </option>
-                                <option value="2">SMS</option>
-                                <option value="3">Acil</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className="row overflow-x-hidden overflow-y-auto"
-                         style={{
-                             fontSize: "12px",
-                             height: "150px",
-                             border: "1px solid #CFF4FC",
-                             borderRadius: "5px"
-                         }}>
-                        <table>
-                            <thead>
-                            <tr className="text-center">
-                                <th scope="col"
-                                    style={{
-                                        position: "sticky",
-                                        top: "0",
-                                        backgroundColor: "white",
-                                        zIndex: "1"
-                                    }}>Çağrı ID
-                                </th>
-                                <th scope="col"
-                                    style={{
-                                        position: "sticky",
-                                        top: "0",
-                                        backgroundColor: "white",
-                                        zIndex: "1"
-                                    }}>Numara
-                                </th>
-                                <th scope="col"
-                                    style={{
-                                        position: "sticky",
-                                        top: "0",
-                                        backgroundColor: "white",
-                                        zIndex: "1"
-                                    }}>Çağrı Zamanı
-                                </th>
-                                <th scope="col" style={{
-                                    position: "sticky",
-                                    top: "0",
-                                    backgroundColor: "white",
-                                    zIndex: "1"
-                                }}>Enlem/Boylam
-                                </th>
-                                <th scope="col"
-                                    style={{
-                                        position: "sticky",
-                                        top: "0",
-                                        backgroundColor: "white",
-                                        zIndex: "1"
-                                    }}>Çağrı Konumu
-                                </th>
-                                <th scope="col" style={{
-                                    position: "sticky",
-                                    top: "0",
-                                    backgroundColor: "white",
-                                    zIndex: "1"
-                                }}>Çağrıyı Kaldır
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody className={"text-center"}>
-                            {data.callHistory.map((call, index) => (
-                                <tr key={index}>
-                                    <td>{call.callId}</td>
-                                    <td>{call.number}</td>
-                                    <td>{new Date(call.callTime).toLocaleString()}</td>
-                                    <td>{call["lat-lot"]}</td>
-                                    <td>{call["call-location"]}</td>
-                                    <td className={"d-flex justify-content-center"}>
-                                        <div className="form-check">
-                                            <input className="form-check-input " type="checkbox"
-                                                   id={`checkbox-${index}`} defaultChecked={call["call-attribution"]}
-                                            />
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
+                    <div className="row">
+                        <CallLogs isSmall={false}/>
                     </div>
                     <div className="row ps-3"
                          style={{height: "75px", border: "1px solid #CFF4FC", borderRadius: "5px"}}>
@@ -298,41 +300,33 @@ function EventDetails({data, removeTab}) {
                         </div>
                         <div className="row h-75"></div>
                     </div>
-                    <div className="row">
-                        <div className="col bg-info-subtle m-0 p-0" style={{height: "56vh", position: "relative"}}>
-                            <div className="row m-0 p-0" style={{height: "30px"}}><b>Vaka Tanımı</b></div>
-                            <div className="row m-0 p-0 h-75 overflow-y-auto">
+                    <div className="row" style={{height: "105vh"}}>
+                        <div className="col bg-info-subtle m-0 p-0" style={{height: "330px", position: "relative"}}>
+                            <div className="row m-0 p-0 text-center" style={{height: "30px"}}><b>Vaka Tanımı</b></div>
+                            <div className="row m-0 overflow-y-auto p-0 m-0 h-100">
                                 <input
-                                    list="datalistOptions"
-                                    value={selectedOption}
-                                    onChange={handleOptionChange}
-                                    className="form-control"
+                                    className="form-control sticky-top bg-white"
                                     placeholder="Arama..."
                                     style={{height: "42px"}}
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
                                 />
-                                <datalist id="datalistOptions">
-                                    {Object.entries(caseDefinitions).map(([key, value]) => (
-                                        <option key={key} value={value}/>
-                                    ))}
-                                </datalist>
-
-                                <table className="table">
+                                <table className="table h-100">
                                     <tbody>
-                                    {filteredDefinitions.map(([key, value]) => (
-                                        <tr key={key}>
-                                            <th>
-                                                <div className="form-check">
-                                                    <input className="form-check-input"
-                                                           type="checkbox"
-                                                           value={key}
-                                                           id={`checkbox-${key}`}
-                                                           onChange={() => handleCheckList(key)}
-                                                    />
-                                                    <label className="form-check-label" htmlFor={`checkbox-${key}`}>
-                                                        {value}
-                                                    </label>
-                                                </div>
-                                            </th>
+                                    {filteredList.map((item, key) => (
+                                        <tr key={key + 1} className={"align-items-start"}>
+                                            <td>
+                                                <AccordionRow
+                                                    key={key + 1}
+                                                    index={key + 1}
+                                                    content={item}
+                                                    incidentsList={incidentsList}
+                                                    onHeaderSelect={handleHeaderSelect}
+                                                    onSubItemSelect={handleSubItemSelect}
+                                                    selectedHeaders={selectedHeaders}
+                                                    selectedSubItems={selectedSubItems[item] || []}
+                                                />
+                                            </td>
                                         </tr>
                                     ))}
                                     </tbody>
@@ -340,124 +334,85 @@ function EventDetails({data, removeTab}) {
                             </div>
                         </div>
                         <div className="col" style={{height: "450px", position: "relative"}}>
-                            <div className="row" style={{height: "250px"}}>Vaka Listesi</div>
+                            <div className="row user-select-none text-center"
+                                 style={{height: "250px", overflowY: "auto", padding: "0 0 120px 0"}}>
+                                <table>
+                                    <thead className="sticky-top bg-white">
+                                    <tr>
+                                        <th className={"col-6"}>Üst Başlık</th>
+                                        <th className={"col-6"}>Alt Başlıklar</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {selectedHeaders.map(header => (
+                                        <tr key={header}>
+                                            <td>{header}</td>
+                                            <td className={"text-start"}>
+                                                {selectedSubItems[header] && selectedSubItems[header].length > 0
+                                                    ? selectedSubItems[header].join(', ')
+                                                    : '—'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
                             <div className="row bg-danger-subtle justify-content-center pb-3"
                                  style={{position: "sticky", bottom: "0", zIndex: "10"}}>
                                 <div className="row w-50">
-                                    <input className="form-control mt-3" list="provinceDatalist" id="provinceDataInput"
-                                           placeholder="İl Seçiniz..." onBlur={handleCityChoose} defaultValue={"Ankara"}/>
+                                    <input className="form-control mt-3" list="provinceDatalist"
+                                           id="provinceDataInput"
+                                           placeholder="İl Seçiniz..."
+                                           defaultValue={city}/>
                                     <datalist id="provinceDatalist">
                                         {province.length > 0 && province.map((city, index) => (
-                                                <option key={index} value={city.name}/>
+                                            <option key={index} value={city}/>
                                         ))}
                                     </datalist>
                                 </div>
-                                <div className="row h-100 fs-5 flex-wrap">
-                                    <div className="row h-100 fs-5 flex-wrap">
-                                        <input
-                                            type="checkbox"
-                                            className="btn-check"
-                                            id="Emniyet"
-                                            autoComplete="off"
-                                            onChange={handleCheckboxChange}
-                                        />
-                                        <label className="btn col-3 my-3 btn-danger fs-5" htmlFor="Emniyet">
-                                            <RiPoliceBadgeLine size={"14px"}/> Emniyet
-                                        </label>
-
-                                        <input
-                                            type="checkbox"
-                                            className="btn-check"
-                                            id="Sağlık"
-                                            autoComplete="off"
-                                            onChange={handleCheckboxChange}
-                                        />
-                                        <label className="btn col-3 my-3 btn-danger fs-5" htmlFor="Sağlık">
-                                            <LiaAmbulanceSolid size={"14px"}/> Sağlık
-                                        </label>
-
-                                        <input
-                                            type="checkbox"
-                                            className="btn-check"
-                                            id="Jandarma"
-                                            autoComplete="off"
-                                            onChange={handleCheckboxChange}
-                                        />
-                                        <label className="btn col-3 my-3 btn-danger fs-5" htmlFor="Jandarma">
-                                            <MdLocalPolice size={"14px"}/> Jandarma
-                                        </label>
-
-                                        <input
-                                            type="checkbox"
-                                            className="btn-check"
-                                            id="İtfaiye"
-                                            autoComplete="off"
-                                            onChange={handleCheckboxChange}
-                                        />
-                                        <label className="btn col-3 my-3 btn-danger fs-5" htmlFor="İtfaiye">
-                                            <MdOutlineFireTruck size={"14px"}/> İtfaiye
-                                        </label>
-
-                                        <input
-                                            type="checkbox"
-                                            className="btn-check"
-                                            id="Orman"
-                                            autoComplete="off"
-                                            onChange={handleCheckboxChange}
-                                        />
-                                        <label className="btn col-3 my-3 btn-danger fs-5" htmlFor="Orman">
-                                            <GiCircleForest size={"14px"}/> Orman
-                                        </label>
-
-                                        <input
-                                            type="checkbox"
-                                            className="btn-check"
-                                            id="Afad"
-                                            autoComplete="off"
-                                            onChange={handleCheckboxChange}
-                                        />
-                                        <label className="btn col-3 my-3 btn-danger fs-5" htmlFor="Afad">
-                                            <TbRadioactiveFilled size={"14px"}/> Afad
-                                        </label>
-
-                                        <div className="col-3 mb-3"><i>Kurum Ekleyiniz...</i></div>
-
-                                    </div>
-                                </div>
+                                <Department isSmall={false} onSelectionChange={handleDepartmentSelectionChange}/>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="col-3 ps-4">
-                    <Address districts={district}/>
+                <div className="col-3 h-25">
+                    <Address districts={district} triggerUpdate={triggerUpdate}/>
+                    <div className="row w-100 ps-3">
+                        <div className="btn btn-danger" onClick={() => {
+                            document.getElementById("addressDescription").value = ""
+                            setTriggerUpdate(prevState => prevState + 1);
+                        }}>Konum Detaylarını Temizle
+                        </div>
+                    </div>
+                    <div className="row w-100 ps-3">
+                        <textarea
+                            className="form-control p-2 mt-1"
+                            id="caseDescription"
+                            placeholder={"Vaka Açıklaması"}
+                            rows="6"
+                            maxLength={1024}
+                            style={{maxHeight: "200px"}}
+                        />
+                        <span className={"text-end"} style={{fontSize: "10px"}}>{1024 + "/1024"}</span>
+                    </div>
                 </div>
             </div>
-            <div className="modal fade" ref={modalRef} id="staticEventModal" data-bs-backdrop="static"
-                 data-bs-keyboard="false"
-                 tabIndex="-1" aria-labelledby="eventModal" aria-hidden="true">
+
+            <div className="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+                 tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" ref={modalRef}>
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h1 className="modal-title fs-5 user-select-none" id="eventModal">{message.title}</h1>
+                            <h1 className="modal-title fs-5" id="staticBackdropLabel">{message.title}</h1>
                         </div>
-                        <div className="modal-body fs-5 text-center user-select-none"
-                             style={{fontWeight: "600"}}>
-
-                            {message.title === "Hata" ? (
-                                <><FcHighPriority size={"32px"}/> {message.content}</>
-                            ) : (
-                                <> {message.content}</>
-                            )}
-
+                        <div className="modal-body text-center">
+                            {message.content}
                         </div>
                         <div className="modal-footer">
-                            <button type="button" ref={closeButtonRef} className="btn btn-outline-success"
-                                    data-bs-dismiss="modal"
-                                    onClick={
-                                        () => handleCloseModal()
-                                    }
-                            >
-                                Tamam
+                            <button
+                                type="button"
+                                className="btn btn-success"
+                                data-bs-dismiss="modal" onClick={handleCloseModal}>Tamam
                             </button>
                         </div>
                     </div>

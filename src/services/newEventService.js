@@ -1,4 +1,46 @@
+import axios from "axios";
+
 export default class NewEventService {
+    static getAddress = {
+        getProvince: async () => {
+            try {
+                return await axios.get("http://localhost:8002/province")
+            } catch (error) {
+                console.error("API request failed:", error);
+                throw error;
+            }
+        },
+        getDistrict: async (province) => {
+            try {
+                return await axios.get("http://localhost:8002/district/" + province);
+            } catch (error) {
+                console.error("API request failed:", error);
+                throw error;
+            }
+        },
+        getNeighborhoods: async (province,district) => {
+            try {
+                if (province && district) {
+                    return await axios.get("http://localhost:8000/neighborhood/" + province.toUpperCase() +"/"+ district.toUpperCase());
+                }
+            } catch (error) {
+                console.error("API request failed:", error);
+                throw error;
+            }
+        }
+    }
+
+    static getIncidents={
+        getData: async () => {
+            try{
+                return await axios.get("http://localhost:8002/incident")
+            }catch (error) {
+                console.error("API request failed:", error);
+                throw error;
+            }
+        }
+    }
+
     generateRandomPhoneNumber() {
         const prefix = '0312';
         const number = Math.floor(Math.random() * 1000000).toString().padStart(7, '0');
@@ -328,7 +370,7 @@ export default class NewEventService {
         };
     }
 
-    sendData(data){
+    sendData(data) {
         return console.log(JSON.stringify({data}));
     }
 }

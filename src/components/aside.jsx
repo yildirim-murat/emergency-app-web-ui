@@ -24,12 +24,17 @@ function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, ac
 
     return (
         <div>
-            <div className="row overflow-hidden" style={{height: "300px"}}>
+            <div className="row overflow-hidden user-select-none" style={{height: "300px"}}>
                 <nav>
-                    <div className="nav nav-tabs" style={{fontSize: "11px"}} id="nav-tab" role="tablist">
+                    <div className="nav nav-tabs" style={{fontSize: "11px", width: "400px"}} id="nav-tab"
+                         role="tablist">
                         <button className="nav-link active" id="nav-phone-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-phone" type="button" role="tab" aria-controls="nav-phone"
                                 aria-selected="true">Softphone
+                        </button>
+                        <button className="nav-link" id="nav-call-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-call" type="button" role="tab" aria-controls="nav-call"
+                                aria-selected="false">Kurum Kuyruğu
                         </button>
                         <button className="nav-link" id="nav-off-time-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-off-time" type="button" role="tab" aria-controls="nav-off-time"
@@ -40,10 +45,160 @@ function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, ac
                 <div className="tab-content" id="nav-tabContent">
                     <div className="tab-pane fade show active" id="nav-phone" role="tabpanel"
                          aria-labelledby="nav-phone-tab" tabIndex="0">
-                        <Numpad callNu={call()} inCall={inCall} onCall={onCall} acceptData={acceptData} voice={voice} />
+                        <Numpad callNu={call()} inCall={inCall} onCall={onCall} acceptData={acceptData} voice={voice}/>
                     </div>
-                    <div className="tab-pane fade" id="nav-off-time" role="tabpanel" aria-labelledby="nav-off-time-tab"
-                         tabIndex="0">Mola Süreleri
+                    <div className="tab-pane fade text-center" id="nav-call" role="tabpanel"
+                         aria-labelledby="nav-call-tab"
+                         tabIndex="0">
+                        <div className="row" style={{height: "200px", overflowY: "auto"}}>
+                            <table className="table">
+                                <thead className="sticky-top bg-white">
+                                <tr>
+                                    <th className={"col-5"} scope="col">Arayan Numara</th>
+                                    <th className={"col-7"} scope="col">Çağrı Zamanı</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+                                <tr>
+                                    <td>03121120000</td>
+                                    <td>01.01.2025 12:34:56</td>
+                                </tr>
+
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                    <div className="tab-pane fade text-center" id="nav-off-time" role="tabpanel"
+                         aria-labelledby="nav-off-time-tab"
+                         tabIndex="0">
+                        <div className="row ps-4">Toplam Mola Süresi: 00:00:00</div>
+                        <div className="row" style={{height: "200px", overflowY: "auto"}}>
+                            <table className="table ">
+                                <thead className="sticky-top bg-white">
+                                <tr>
+                                    <th className={"col-4"} scope="col">Giriş</th>
+                                    <th className={"col-4"} scope="col">Çıkış</th>
+                                    <th className={"col-4"} scope="col">Süre</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {/*{logData.map((log, index) => (*/}
+                                {/*    <tr key={index}>*/}
+                                {/*        <td>{log.entry}</td>*/}
+                                {/*        <td>{log.exit || '-'}</td>*/}
+                                {/*        <td>{log.exit - log.entry}</td>*/}
+                                {/*    </tr>*/}
+                                {/*))}*/}
+                                <tr>
+                                    <td>12:34:56</td>
+                                    <td>12:34:56</td>
+                                    <td>00:00:00</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -120,8 +275,10 @@ function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, ac
                                 }
 
                                 return (
-                                    <div key={index} className={`${bgColor} row m-1 mb-0 p-0 user-select-none text-light rounded`}
-                                         style={{cursor: "pointer", fontSize: "12px"}} onDoubleClick={publishDepartment}>
+                                    <div key={index}
+                                         className={`${bgColor} row m-1 mb-0 p-0 user-select-none text-light rounded`}
+                                         style={{cursor: "pointer", fontSize: "12px"}}
+                                         onDoubleClick={publishDepartment}>
                                         <div className="row flex-nowrap" title={item.staffName}>
                                             <div className="col-1"><VscCallOutgoing size={"12px"}/></div>
                                             <div className="col-12">
@@ -157,45 +314,52 @@ function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, ac
                             <RiPoliceBadgeLine
                                 size={"18px"}/>
                         </div>
-                        <div className="col-9 user-select-none" ><b className={"transferredFrom"}>EMNİYET</b></div>
+                        <div className="col-9 user-select-none"><b className={"transferredFrom"}>EMNİYET</b></div>
                     </div>
-                    <div className="row bg-info h-25 align-items-center" style={{cursor: "pointer"}} onDoubleClick={publishDepartment}>
+                    <div className="row bg-info h-25 align-items-center" style={{cursor: "pointer"}}
+                         onDoubleClick={publishDepartment}>
                         <div className="col-1">
                             <LiaAmbulanceSolid
                                 size={"18px"}/>
                         </div>
                         <div className="col-9 user-select-none"><b className={"transferredFrom"}>SAĞLIK</b></div>
                     </div>
-                    <div className="row bg-info h-25 align-items-center" style={{cursor: "pointer"}} onDoubleClick={publishDepartment}>
+                    <div className="row bg-info h-25 align-items-center" style={{cursor: "pointer"}}
+                         onDoubleClick={publishDepartment}>
                         <div className="col-1">
                             <LiaAmbulanceSolid
                                 size={"18px"}/>
                         </div>
                         <div className="col-9 user-select-none"><b className={"transferredFrom"}>Sağlık Nakil</b></div>
                     </div>
-                    <div className="row bg-info h-25 align-items-center" style={{cursor: "pointer"}} onDoubleClick={publishDepartment}>
+                    <div className="row bg-info h-25 align-items-center" style={{cursor: "pointer"}}
+                         onDoubleClick={publishDepartment}>
                         <div className="col-1">
                             <LiaAmbulanceSolid
                                 size={"18px"}/>
                         </div>
                         <div className="col-9 user-select-none"><b className={"transferredFrom"}>Sağlık Doktor</b></div>
                     </div>
-                    <div className="row bg-success h-25 align-items-center" style={{cursor: "pointer"}} onDoubleClick={publishDepartment}>
+                    <div className="row bg-success h-25 align-items-center" style={{cursor: "pointer"}}
+                         onDoubleClick={publishDepartment}>
                         <div className="col-1"><GiCircleForest
                             size={"18px"}/></div>
                         <div className="col-9 user-select-none"><b className={"transferredFrom"}>ORMAN</b></div>
                     </div>
-                    <div className="row bg-primary h-25 align-items-center" style={{cursor: "pointer"}} onDoubleClick={publishDepartment}>
+                    <div className="row bg-primary h-25 align-items-center" style={{cursor: "pointer"}}
+                         onDoubleClick={publishDepartment}>
                         <div className="col-1"><MdLocalPolice
                             size={"18px"}/></div>
                         <div className="col-9 user-select-none"><b className={"transferredFrom"}>JANDARMA</b></div>
                     </div>
-                    <div className="row bg-danger h-25 align-items-center" style={{cursor: "pointer"}} onDoubleClick={publishDepartment}>
+                    <div className="row bg-danger h-25 align-items-center" style={{cursor: "pointer"}}
+                         onDoubleClick={publishDepartment}>
                         <div className="col-1"><MdOutlineFireTruck
                             size={"18px"}/></div>
                         <div className="col-9 user-select-none"><b className={"transferredFrom"}>İTFAİYE</b></div>
                     </div>
-                    <div className="row bg-primary h-25 align-items-center" style={{cursor: "pointer"}} onDoubleClick={publishDepartment}>
+                    <div className="row bg-primary h-25 align-items-center" style={{cursor: "pointer"}}
+                         onDoubleClick={publishDepartment}>
                         <div className="col-1"><TbRadioactiveFilled
                             size={"18px"}/></div>
                         <div className="col-9 user-select-none"><b className={"transferredFrom"}>AFAD</b></div>
@@ -209,17 +373,20 @@ function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, ac
                     <div className="row pt-4 bg-secondary text-light text-center user-select-none"
                          onDoubleClick={publishDepartment}
                          style={{cursor: "pointer"}}>
-                        <div className="col-12 user-select-none text-center"><b className={"transferredFrom"}>Arapça</b></div>
+                        <div className="col-12 user-select-none text-center"><b className={"transferredFrom"}>Arapça</b>
+                        </div>
                     </div>
                     <div className="row pt-4 bg-secondary text-light text-center user-select-none"
                          onDoubleClick={publishDepartment}
                          style={{cursor: "pointer"}}>
-                        <div className="col-12 user-select-none text-center"><b className={"transferredFrom"}>Almanca</b></div>
+                        <div className="col-12 user-select-none text-center"><b
+                            className={"transferredFrom"}>Almanca</b></div>
                     </div>
                     <div className="row pt-4 bg-secondary text-light text-center user-select-none"
                          onDoubleClick={publishDepartment}
                          style={{cursor: "pointer"}}>
-                        <div className="col-12 user-select-none text-center"><b className={"transferredFrom"}>Rusça</b></div>
+                        <div className="col-12 user-select-none text-center"><b className={"transferredFrom"}>Rusça</b>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -235,7 +402,8 @@ Aside.propTypes = {
     inCall: PropTypes.bool.isRequired,
     onCall: PropTypes.func,
     acceptData: PropTypes.func,
-    voice: PropTypes.func.isRequired
+    voice: PropTypes.func.isRequired,
+    logData: PropTypes.array,
 }
 
 export default Aside;
