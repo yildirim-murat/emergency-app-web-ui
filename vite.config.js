@@ -9,7 +9,7 @@ export default defineConfig(({mode}) => {
     plugins: [react()],
     server: {
       host: '0.0.0.0',
-      port: 5173
+      port: 3000
     },
     define:{
       __APP_ENV__: JSON.stringify(env.VITE_WEBSOCKET_URL),

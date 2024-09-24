@@ -1,5 +1,9 @@
-function Navbar() {
+import {ImExit} from "react-icons/im";
+import {removeToken} from "../localStorage.js";
+import {useNavigate} from "react-router-dom";
 
+function Navbar() {
+    const navigate = useNavigate();
     return (
         <nav className="navbar navbar-expand-lg bg-danger">
             <div className="container-fluid">
@@ -34,6 +38,13 @@ function Navbar() {
                             <a className="nav-link disabled" aria-disabled="true">Yardım</a>
                         </li>
                     </ul>
+                    <form className="d-flex" role="search">
+                        <button className="btn btn-secondary" type="submit" onClick={()=> {
+                            removeToken();
+                            navigate("/login")
+                        }}><ImExit size={"20px"}/> Çıkış Yap
+                        </button>
+                    </form>
                 </div>
             </div>
         </nav>

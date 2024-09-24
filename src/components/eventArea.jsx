@@ -112,14 +112,13 @@ function EventArea() {
                         aria-labelledby={`${tab.id}-tab`}
                         tabIndex="0"
                     >
-                        {/*<EventDetails data={tab.data} removeTab={() => removeTab(tab.id)}/>*/}
-                        <HealthEvent data={tab.data} onSelectChange={handleSelectChange}/>
+                        <EventDetails data={tab.data} removeTab={() => removeTab(tab.id)}/>
+                        {/*<HealthEvent data={tab.data} onSelectChange={handleSelectChange}/>*/}
                         {/*<PoliceEvent data={tab.data}/>*/}
                         {/*<GendarmeEvent data={tab.data}/>*/}
                         {/*<FireDepartmentEvent data={tab.data}/>*/}
                         {/*<ForestryEvent data={tab.data}/>*/}
                         {/*<DAEMEvent data={tab.data}/>*/}
-                        {/*Şimdi buradayım 15:39 22.09.2024*/}
                         {/*<CoastGuardEvent data={tab.data}/>*/}
                     </div>
                 ))}

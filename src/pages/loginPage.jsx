@@ -1,36 +1,142 @@
-import logo from "/assets/logo.jpg"
-import {useNavigate} from 'react-router-dom'
+import logo from "/assets/logo.jpg";
+import {useNavigate} from 'react-router-dom';
+import {useFormik} from 'formik';
+import * as Yup from 'yup';
+import {useEffect, useState} from 'react';
+import AuthService from "../services/authService.js";
+import {setToken} from "../localStorage.js";
+import {useDispatch} from "react-redux";
+import {syncUser} from "../store/actions/userActions.js";
 
 function LoginPage() {
     const navigate = useNavigate();
+    const [toastMessage, setToastMessage] = useState({});
+    const [showToast, setShowToast] = useState(false);
 
-    const loginOperation =()=>{
-        navigate("/main")
-    }
+    const authService = new AuthService();
+
+    const navigateSignUp = () => {
+        navigate("/signup");
+    };
+
+    const dispatch = useDispatch();
+
+    const formik = useFormik({
+        initialValues: {
+            tcknOrEmail: '',
+            password: '',
+        },
+        validationSchema: Yup.object({
+            tcknOrEmail: Yup.string().required("TCKN veya E-posta gereklidir"),
+            password: Yup.string().min(6, "Şifre en az 6 karakter olmalıdır").required("Şifre gereklidir"),
+        }),
+        onSubmit: async (values, {setSubmitting}) => {
+
+            authService.login(values.tcknOrEmail, values.password)
+                .then(response => {
+                    console.log("response", JSON.stringify(response, null, 2));
+
+                    // setToken("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtdXJhdHlpbGRpcmltLndvcmtAZ21haWwuY29tIiwiZXhwIjoxNzI3MzMyMDQyLCJpc3MiOiJCYXNlUHJvamVjdFJlc3RBcGkiLCJpYXQiOjE3MjcxNTkyNDJ9.FKrHdJbJXJB5a6lXdDx33qyppsqfLs-3PsWdQqzRk2lk8ckc2NCSgAREgxQnwngjDkdkH7gUIltD5l2ZRA0aOQ")
+                    // dispatch(syncUser(response.data.data));
+                    // navigate("/main")
+                    setToastMessage({header: "Başarılı",content: "Sisteme Başarıyla Giriş Yapıldı."})
+                    setShowToast(true);
+                }).catch(error => {
+                let errorMessage;
+                if (error.response && error.response.status === 401) {
+                    errorMessage = "Geçersiz TCKN/E-posta veya şifre";
+                } else {
+                    errorMessage = "Bir hata oluştu, lütfen tekrar deneyiniz." + error;
+                }
+                setToastMessage({header:"Hata",content:errorMessage});
+                setShowToast(true);
+            }).finally(() => {
+                setSubmitting(false);
+            });
+        }
+    });
+
+    useEffect(() => {
+        if (showToast) {
+            const timer = setTimeout(() => {
+                setShowToast(false);
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [showToast]);
+
     return (
         <div className={"d-flex justify-content-center align-items-center w-100 h-100 user-select-none"}
              style={{backgroundColor: "#E30E13"}}>
             <form className="row g-3 bg-white"
-                  style={{borderRadius: "40px 0 40px 40px", border: "2px solid #E30E13", padding: "75px 50px"}}>
-                <div className="form-group d-flex justify-content-center align-items-center  w-100 h-100"><img
-                    style={{height: "250px", width: "250px", overflow: "hidden"}} src={logo} alt={"112-logo"}/></div>
-                <input type="email" className="form-control" id="loginForm"
-                       placeholder="T.C. Kimlik Nu"/>
-                <input type="password" className="form-control my-3" id="loginFormPass" placeholder="Şifreniz"/>
+                  style={{borderRadius: "40px 0 40px 40px", border: "2px solid #E30E13", padding: "75px 50px"}}
+                  onSubmit={formik.handleSubmit}>
 
-                <div className={"text-center text-white fs-4"}
-                     style={{
-                         backgroundColor: "#343E59",
-                         borderRadius: "10px 0 10px 10px",
-                         height: "40px",
-                         cursor:"pointer"
-                }} onClick={loginOperation}>
-                    Giriş
+                <div className="form-group d-flex justify-content-center align-items-center w-100 h-100">
+                    <img style={{height: "250px", width: "250px", overflow: "hidden"}} src={logo}
+                         alt={"112-logo"}/>
                 </div>
+
+                <div className="mb-3">
+                    <input
+                        type="text"
+                        id="tcknOrEmail"
+                        className={`form-control ${formik.touched.tcknOrEmail && formik.errors.tcknOrEmail ? 'is-invalid' : ''}`}
+                        placeholder="TCKN veya E-posta"
+                        value={formik.values.tcknOrEmail}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                    />
+                    {formik.touched.tcknOrEmail && formik.errors.tcknOrEmail ? (
+                        <div className="text-danger">{formik.errors.tcknOrEmail}</div>
+                    ) : null}
+                </div>
+
+                <div className="mb-3">
+                    <input
+                        type="password"
+                        id="password"
+                        className={`form-control ${formik.touched.password && formik.errors.password ? 'is-invalid' : ''}`}
+                        placeholder="Şifre"
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                    />
+                    {formik.touched.password && formik.errors.password ? (
+                        <div className="text-danger">{formik.errors.password}</div>
+                    ) : null}
+                </div>
+
+                <button
+                    type="submit"
+                    className={"btn w-100"}
+                    style={{backgroundColor: "#343E59", borderRadius: "10px 0 10px 10px", color: "white"}}
+                    disabled={formik.isSubmitting}
+                >
+                    {formik.isSubmitting ? "Giriş yapılıyor..." : "Giriş Yap"}
+                </button>
+
+                <button type="button" className="btn btn-link w-100 mt-2" onClick={navigateSignUp}>
+                    veya Kaydol
+                </button>
             </form>
+
+            {showToast && (
+                <div className="toast show position-fixed bottom-0 end-0 m-3" role="alert" aria-live="assertive"
+                     aria-atomic="true">
+                    <div className="toast-header">
+                        <strong className="me-auto">{toastMessage.header}</strong>
+                        <button type="button" className="btn-close" onClick={() => setShowToast(false)}
+                                aria-label="Close"></button>
+                    </div>
+                    <div className="toast-body">
+                        {toastMessage.content}
+                    </div>
+                </div>
+            )}
         </div>
-    )
-        ;
+    );
 }
 
 // #343E59

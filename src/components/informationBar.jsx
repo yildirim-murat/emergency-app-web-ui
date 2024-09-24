@@ -73,14 +73,12 @@ function InformationBar({setSelectedOption, inCall, setIsConnected}) {
                             <div className="btn-group" role="group"
                                  aria-label="Basic radio toggle button group">
                                 <input type="radio" className="btn-check" name="btnradio" id="btnavaliable"
-                                       autoComplete="off" onClick={changeTextAvailable}/>
-                                <label className="btn btn-outline-success"
-                                       htmlFor="btnavaliable">
+                                       autoComplete="off" onClick={changeTextAvailable} defaultChecked/>
+                                <label className="btn btn-outline-success" htmlFor="btnavaliable">
                                     {textAvailable}
                                 </label>
                                 <input type="radio" className="btn-check" name="btnradio" id="btnexemption"
-                                       autoComplete="off" disabled={inCall} onClick={changeTextExemption}
-                                       defaultChecked/>
+                                       autoComplete="off" disabled={inCall} onClick={changeTextExemption}/>
                                 <label className="btn btn-outline-secondary"
                                        htmlFor="btnexemption"><HiPhoneMissedCall size={"1.5rem"}/>
                                     {textExemption}
@@ -101,7 +99,7 @@ function InformationBar({setSelectedOption, inCall, setIsConnected}) {
                                 size={"1.5rem"}/>Harita
                             </div>
                         </div>
-                        <div className="col-lg-2">
+                        <div className="col-lg-2" style={{pointerEvents:"none"}}>
                             <div className={"btn btn-sm btn-outline-info"} onClick={openSiteRecords}>
                                 <MdOutlineRecordVoiceOver size={"1.5rem"}/>Ses
                             </div>

@@ -23,10 +23,10 @@ function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, ac
     }
 
     return (
-        <div>
+        <div style={{pointerEvents:"none", userSelect:"none"}}>
             <div className="row overflow-hidden user-select-none" style={{height: "300px"}}>
                 <nav>
-                    <div className="nav nav-tabs" style={{fontSize: "11px", width: "400px"}} id="nav-tab"
+                    <div className="nav nav-tabs" style={{fontSize: "11px", width: "400px"}} id="nav-history-tab"
                          role="tablist">
                         <button className="nav-link active" id="nav-phone-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-phone" type="button" role="tab" aria-controls="nav-phone"
@@ -42,7 +42,7 @@ function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, ac
                         </button>
                     </div>
                 </nav>
-                <div className="tab-content" id="nav-tabContent">
+                <div className="tab-content" id="nav-history-tabContent">
                     <div className="tab-pane fade show active" id="nav-phone" role="tabpanel"
                          aria-labelledby="nav-phone-tab" tabIndex="0">
                         <Numpad callNu={call()} inCall={inCall} onCall={onCall} acceptData={acceptData} voice={voice}/>
@@ -204,19 +204,19 @@ function Aside({calledNu, callHistory, missedCall, staffData, inCall, onCall, ac
             </div>
             <div className="row" style={{fontSize: "12px", height: "26vh", overflow: "hidden"}}>
                 <nav>
-                    <div className="nav nav-tabs h-100" id="nav-called-tab" role="tablist">
+                    <div className="nav nav-tabs" id="nav-called-tab" role="tablist">
                         <button className="nav-link active" id="nav-call-tab" data-bs-toggle="tab"
-                                data-bs-target="#nav-call" type="button" role="tab" aria-controls="nav-call"
+                                data-bs-target="#nav-call" type="button" role="tab" aria-controls="nav-call-tab"
                                 aria-selected="true">Çağrılarım
                         </button>
                         <button className="nav-link" id="nav-missed-call-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-missed-call" type="button" role="tab"
-                                aria-controls="nav-missed-call"
+                                aria-controls="nav-missed-call-tab"
                                 aria-selected="false">Cevapsız Çağrı
                         </button>
                     </div>
                 </nav>
-                <div className="tab-content h-100 pe-0 pb-4" id="nav-tabContent">
+                <div className="tab-content h-100 pe-0 pb-4" id="nav-called-tabContent">
                     <div className="tab-pane fade show active overflow-y-auto h-100" id="nav-call" role="tabpanel"
                          aria-labelledby="nav-call-tab" tabIndex="0">
                         <ListOfNumber listOfCall={callHistory}/>
