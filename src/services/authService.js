@@ -8,3 +8,16 @@ export default class AuthService {
         });
     }
 }
+
+export class StaffService{
+    createStaff( firstName, lastName, identityNumber,phoneNumber,username,departmentName) {
+        return axios.post(`http://localhost:8080/api/v1/staff/create`, {
+            firstName: firstName,
+            lastName: lastName,
+            identityNumber: identityNumber,
+            phoneNumber: phoneNumber,
+            username: username,
+            departmentName: departmentName
+        })
+    }
+}

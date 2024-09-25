@@ -12,6 +12,7 @@ function LoginPage() {
     const navigate = useNavigate();
     const [toastMessage, setToastMessage] = useState({});
     const [showToast, setShowToast] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const authService = new AuthService();
 
@@ -31,16 +32,19 @@ function LoginPage() {
             password: Yup.string().min(6, "Şifre en az 6 karakter olmalıdır").required("Şifre gereklidir"),
         }),
         onSubmit: async (values, {setSubmitting}) => {
-
+            if (loading) return;
+            setLoading(true);
             authService.login(values.tcknOrEmail, values.password)
                 .then(response => {
-                    console.log("response", JSON.stringify(response, null, 2));
-
-                    // setToken("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtdXJhdHlpbGRpcmltLndvcmtAZ21haWwuY29tIiwiZXhwIjoxNzI3MzMyMDQyLCJpc3MiOiJCYXNlUHJvamVjdFJlc3RBcGkiLCJpYXQiOjE3MjcxNTkyNDJ9.FKrHdJbJXJB5a6lXdDx33qyppsqfLs-3PsWdQqzRk2lk8ckc2NCSgAREgxQnwngjDkdkH7gUIltD5l2ZRA0aOQ")
-                    // dispatch(syncUser(response.data.data));
-                    // navigate("/main")
-                    setToastMessage({header: "Başarılı",content: "Sisteme Başarıyla Giriş Yapıldı."})
+                    setToastMessage({header: "Başarılı", content: "Sisteme Başarıyla Giriş Yapıldı."});
                     setShowToast(true);
+                    localStorage.setItem("user", JSON.stringify(response.data.data));
+                    setToken(response.headers.authorization);
+                    dispatch(syncUser(response.data.data));
+                    setTimeout(() => {
+                        navigate("/main");
+                        setLoading(false)
+                    }, 3000);
                 }).catch(error => {
                 let errorMessage;
                 if (error.response && error.response.status === 401) {
@@ -48,8 +52,9 @@ function LoginPage() {
                 } else {
                     errorMessage = "Bir hata oluştu, lütfen tekrar deneyiniz." + error;
                 }
-                setToastMessage({header:"Hata",content:errorMessage});
+                setToastMessage({header: "Hata", content: errorMessage});
                 setShowToast(true);
+                setLoading(false);
             }).finally(() => {
                 setSubmitting(false);
             });
@@ -69,7 +74,7 @@ function LoginPage() {
     return (
         <div className={"d-flex justify-content-center align-items-center w-100 h-100 user-select-none"}
              style={{backgroundColor: "#E30E13"}}>
-            <form className="row g-3 bg-white"
+            <form className="row g-3 bg-white w-50"
                   style={{borderRadius: "40px 0 40px 40px", border: "2px solid #E30E13", padding: "75px 50px"}}
                   onSubmit={formik.handleSubmit}>
 
@@ -83,7 +88,7 @@ function LoginPage() {
                         type="text"
                         id="tcknOrEmail"
                         className={`form-control ${formik.touched.tcknOrEmail && formik.errors.tcknOrEmail ? 'is-invalid' : ''}`}
-                        placeholder="TCKN veya E-posta"
+                        placeholder="TC Kimlik Numaranız"
                         value={formik.values.tcknOrEmail}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
@@ -110,11 +115,11 @@ function LoginPage() {
 
                 <button
                     type="submit"
-                    className={"btn w-100"}
-                    style={{backgroundColor: "#343E59", borderRadius: "10px 0 10px 10px", color: "white"}}
+                    className={"btn"}
+                    style={{backgroundColor: "#343E59", borderRadius: "10px 0 10px 10px", color: "white", minWidth:"250px"}}
                     disabled={formik.isSubmitting}
                 >
-                    {formik.isSubmitting ? "Giriş yapılıyor..." : "Giriş Yap"}
+                    {loading ? "Giriş yapılıyor..." : "Giriş"}
                 </button>
 
                 <button type="button" className="btn btn-link w-100 mt-2" onClick={navigateSignUp}>

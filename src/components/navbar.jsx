@@ -4,6 +4,7 @@ import {useNavigate} from "react-router-dom";
 
 function Navbar() {
     const navigate = useNavigate();
+
     return (
         <nav className="navbar navbar-expand-lg bg-danger">
             <div className="container-fluid">

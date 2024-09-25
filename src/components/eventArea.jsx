@@ -2,13 +2,6 @@ import {useState} from 'react';
 import {VscNewFile} from 'react-icons/vsc';
 import EventDetails from "./eventDetails.jsx";
 import NewEventService from "../services/newEventService.js";
-import HealthEvent from "./department/healthEvent.jsx";
-import PoliceEvent from "./department/policeEvent.jsx";
-import GendarmeEvent from "./department/gendarmeEvent.jsx";
-import FireDepartmentEvent from "./department/fireDepartmentEvent.jsx";
-import ForestryEvent from "./department/forestryEvent.jsx";
-import DAEMEvent from "./department/DAEMEvent.jsx";
-import CoastGuardEvent from "./department/coastGuardEvent.jsx";
 import {Button, Modal} from "react-bootstrap";
 
 function EventArea() {

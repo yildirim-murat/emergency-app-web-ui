@@ -3,11 +3,13 @@ import {TbCoffee, TbMapStar, TbReportSearch} from "react-icons/tb";
 import {MdOutlineLooksTwo, MdOutlineRecordVoiceOver} from "react-icons/md";
 import {useEffect, useState} from "react";
 import PropTypes from "prop-types";
+import {getReadableDepartmentName} from "../utils/departmentUtils.js";
 
 function InformationBar({setSelectedOption, inCall, setIsConnected}) {
     const [textAvailable, setTextAvailable] = useState("Uygun");
     const [textExemption, setTextExemption] = useState("Çağrı Muafiyeti");
     const [textBreak, setTextBreak] = useState("Mola");
+    const [data, setData] = useState("");
 
     useEffect(() => {
         changeTextExemption();
@@ -59,6 +61,11 @@ function InformationBar({setSelectedOption, inCall, setIsConnected}) {
         window.open("https://ista-wld.ng112.gov.tr", "_blank");
     }
 
+    useEffect(() => {
+        const userData = localStorage.getItem("user");
+        setData(JSON.parse(userData));
+    }, [])
+
     return (
         <nav className="navbar navbar-expand-lg bg-info-subtle">
             <div className="container-fluid">
@@ -68,17 +75,18 @@ function InformationBar({setSelectedOption, inCall, setIsConnected}) {
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="secondNavbarSupportedContent">
-                    <div className="row align-items-center w-100 h-100 user-select-none">
-                        <div className="col-lg-3">
+                    <div className="row align-items-center w-100 h-100 ">
+                        <div className="col-lg-3" style={{visibility: "hidden"}}>
                             <div className="btn-group" role="group"
                                  aria-label="Basic radio toggle button group">
                                 <input type="radio" className="btn-check" name="btnradio" id="btnavaliable"
-                                       autoComplete="off" onClick={changeTextAvailable} defaultChecked/>
+                                       autoComplete="off" onClick={changeTextAvailable}/>
                                 <label className="btn btn-outline-success" htmlFor="btnavaliable">
                                     {textAvailable}
                                 </label>
                                 <input type="radio" className="btn-check" name="btnradio" id="btnexemption"
-                                       autoComplete="off" disabled={inCall} onClick={changeTextExemption}/>
+                                       autoComplete="off" disabled={inCall} onClick={changeTextExemption}
+                                       defaultChecked/>
                                 <label className="btn btn-outline-secondary"
                                        htmlFor="btnexemption"><HiPhoneMissedCall size={"1.5rem"}/>
                                     {textExemption}
@@ -99,7 +107,7 @@ function InformationBar({setSelectedOption, inCall, setIsConnected}) {
                                 size={"1.5rem"}/>Harita
                             </div>
                         </div>
-                        <div className="col-lg-2" style={{pointerEvents:"none"}}>
+                        <div className="col-lg-2" style={{pointerEvents: "none"}}>
                             <div className={"btn btn-sm btn-outline-info"} onClick={openSiteRecords}>
                                 <MdOutlineRecordVoiceOver size={"1.5rem"}/>Ses
                             </div>
@@ -111,7 +119,9 @@ function InformationBar({setSelectedOption, inCall, setIsConnected}) {
                         </div>
                         <div className="col-lg-2"><span className={"d-inline-block text-truncate"}
                                                         style={{fontSize: "12px", maxWidth: "175px"}}>
-                            Staff Name (Department Info)
+
+
+                            {data.firstName} {data.lastName} - {getReadableDepartmentName(data.departmentName)}
                             </span></div>
                         <div className="col-lg-1">
                             <button className={"btn btn-sm btn-outline-info"} disabled={true}><TbReportSearch

@@ -2,22 +2,16 @@ import Navbar from "../components/navbar.jsx";
 import InformationBar from "../components/informationBar.jsx";
 import Aside from "../components/aside.jsx";
 import EventArea from "../components/eventArea.jsx";
-import NewEventService from "../services/newEventService.js";
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
+import PropTypes from "prop-types";
 
 function Dashboard() {
     const [acceptData, setAcceptData] = useState(false);
     const modalRef = useRef(null);
     const closeButtonRef = useRef(null);
-    const [callHistory, setCallHistory] = useState([]);
-    const [missedCall, setMissedCall] = useState([]);
-    const [datasetForStaff, setDataSetForStaff] = useState([]);
     const [message, setMessage] = useState({phone_number: ''});
     const [showModal, setShowModal] = useState(false);
     const [inCall, setInCall] = useState(false);
-    const newEventService = new NewEventService();
-    const audioRef = useRef(null);
-    const audioVoiceRef = useRef(null);
     const [isConnected, setIsConnected] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
 
@@ -43,10 +37,10 @@ function Dashboard() {
     return (
         <div>
             <Navbar/>
-            <InformationBar setSelectedOption={setAcceptData} inCall={true} setIsConnected={setIsConnected}/>
+            <InformationBar setSelectedOption={setAcceptData} inCall={true} setIsConnected={setIsConnected} />
             <div className="d-flex row">
                 <div className="col-2" style={{minWidth: "300px", height: "85vh"}}>
-                    <Aside calledNu={[]}
+                    <Aside calledNu={""}
                            callHistory={[]}
                            missedCall={[]}
                            staffData={[]}
