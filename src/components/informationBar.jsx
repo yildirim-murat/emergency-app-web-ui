@@ -63,7 +63,7 @@ function InformationBar({setSelectedOption, inCall, setIsConnected}) {
 
     useEffect(() => {
         const userData = localStorage.getItem("user");
-        setData(JSON.parse(userData));
+        setData(JSON.parse(userData).data.data);
     }, [])
 
     return (
@@ -75,7 +75,7 @@ function InformationBar({setSelectedOption, inCall, setIsConnected}) {
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="secondNavbarSupportedContent">
-                    <div className="row align-items-center w-100 h-100 ">
+                    <div className="row align-items-center w-100 h-100 user-select-none">
                         <div className="col-lg-3" style={{visibility: "hidden"}}>
                             <div className="btn-group" role="group"
                                  aria-label="Basic radio toggle button group">
@@ -112,13 +112,13 @@ function InformationBar({setSelectedOption, inCall, setIsConnected}) {
                                 <MdOutlineRecordVoiceOver size={"1.5rem"}/>Ses
                             </div>
                         </div>
-                        <div className="col-lg-1">
+                        <div className="col-lg-1" style={{visibility:"hidden"}}>
                                 <span className="col pt-2">
-                                    <div style={{color: "green", fontWeight: "bold"}}>Sokete Bağlı</div>
+                                    <div style={{color: "green", fontWeight: "bold"}}>Soket Bağlı</div>
                                 </span>
                         </div>
                         <div className="col-lg-2"><span className={"d-inline-block text-truncate"}
-                                                        style={{fontSize: "12px", maxWidth: "175px"}}>
+                                                        style={{fontSize: "12px", maxWidth: "250px"}}>
 
 
                             {data.firstName} {data.lastName} - {getReadableDepartmentName(data.departmentName)}

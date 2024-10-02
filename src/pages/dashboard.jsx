@@ -3,7 +3,6 @@ import InformationBar from "../components/informationBar.jsx";
 import Aside from "../components/aside.jsx";
 import EventArea from "../components/eventArea.jsx";
 import {useRef, useState} from "react";
-import PropTypes from "prop-types";
 
 function Dashboard() {
     const [acceptData, setAcceptData] = useState(false);

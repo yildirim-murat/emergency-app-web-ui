@@ -42,6 +42,7 @@ function Navbar() {
                     <form className="d-flex" role="search">
                         <button className="btn btn-secondary" type="submit" onClick={()=> {
                             removeToken();
+                            localStorage.removeItem("user");
                             navigate("/login")
                         }}><ImExit size={"20px"}/> Çıkış Yap
                         </button>

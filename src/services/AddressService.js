@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export default class NewEventService {
+export default class AddressService {
     static getAddress = {
         getProvince: async () => {
             try {
@@ -21,7 +21,7 @@ export default class NewEventService {
         getNeighborhoods: async (province,district) => {
             try {
                 if (province && district) {
-                    return await axios.get("http://localhost:8000/neighborhood/" + province.toUpperCase() +"/"+ district.toUpperCase());
+                    return await axios.get("http://localhost:8002/neighborhood/" + province.toUpperCase() +"/"+ district.toUpperCase());
                 }
             } catch (error) {
                 console.error("API request failed:", error);

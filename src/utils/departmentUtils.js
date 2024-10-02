@@ -17,3 +17,17 @@ const departmentMap = {
 export const getReadableDepartmentName = (departmentName) => {
     return departmentMap[departmentName] || "Bilinmiyor";
 };
+
+
+export const MASKS = {
+    police: 1,
+    health: 2,
+    gendarme: 4,
+    fire_department: 8,
+    forestry: 16,
+    daem: 32,
+};
+
+export const getSelectedDepartmentsFromMask = (selectedMask) => {
+    return Object.keys(MASKS).filter((key) => (selectedMask & MASKS[key]) !== 0);
+};

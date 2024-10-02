@@ -30,7 +30,7 @@ function CallLogs({isSmall}) {
                          }}>
                         <div className="row text-center p-0 m-0">
                             <div className="btn w-50 align-content-center btn-outline-secondary"
-                                 style={{fontSize: "10px"}}>Çağrıyı İlişkilendir (F9)
+                                 style={{fontSize: "10px"}} >Çağrıyı İlişkilendir (F9)
                             </div>
                             <div className="btn w-50 align-content-center btn-outline-secondary"
                                  style={{fontSize: "10px"}}>Çağrıyı Kaldır

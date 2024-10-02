@@ -7,17 +7,31 @@ export default class AuthService {
             password: password
         });
     }
+
+    getData(tcknOrEmail, token) {
+        return axios.get(`http://localhost:8080/api/v1/staff/get/one/fully_joined/by_username`, {
+            headers: {
+                "Authorization": `${token}`,
+                "accept": "*/*"
+            },
+            params: {
+                username: tcknOrEmail
+            }
+        });
+    }
+
 }
 
-export class StaffService{
-    createStaff( firstName, lastName, identityNumber,phoneNumber,username,departmentName) {
+export class StaffService {
+    createStaff(data) {
         return axios.post(`http://localhost:8080/api/v1/staff/create`, {
-            firstName: firstName,
-            lastName: lastName,
-            identityNumber: identityNumber,
-            phoneNumber: phoneNumber,
-            username: username,
-            departmentName: departmentName
+            firstName: data.firstName,
+            lastName: data.lastName,
+            identityNumber: data.identityNumber,
+            phoneNumber: data.phoneNumber,
+            username: data.username,
+            province: data.province,
+            departmentName: data.departmentName
         })
     }
 }

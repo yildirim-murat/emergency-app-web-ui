@@ -4,8 +4,25 @@ import {useEffect, useState} from "react";
 import {StaffService} from "../services/authService.js";
 import {useFormik} from "formik";
 import * as Yup from "yup";
+import AddressService from "../services/AddressService.js";
 
 function SignUp() {
+    const [province, setProvince] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const provinceList = await AddressService.getAddress.getProvince();
+                sessionStorage.setItem("province", JSON.stringify(provinceList.data))
+                setProvince(provinceList.data)
+            } catch (error) {
+                console.log("API request failed:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     const navigate = useNavigate();
     const [toastMessage, setToastMessage] = useState({});
     const [showToast, setShowToast] = useState(false);
@@ -24,6 +41,7 @@ function SignUp() {
             identityNumber: '',
             phoneNumber: '',
             username: '',
+            province:'',
             departmentName: 'CALL_HANDLER'
         },
         validationSchema: Yup.object({
@@ -32,14 +50,23 @@ function SignUp() {
             identityNumber: Yup.string().length(11, "Kimlik numaranız 11 karakter olmalıdır").required("TC Kimlik Nu gereklidir"),
             phoneNumber: Yup.string().min(11, "Telefon numaranızı iletişim için doğru giriniz").required("Telefon Nu gereklidir"),
             username: Yup.string().email().required("E-mail adresiniz gereklidir"),
+            province:Yup.string().required("Bulunduğunuz il gereklidir"),
             departmentName: Yup.string().min(2, "Doğru kurum seçiniz")
         }),
         onSubmit: async (values, {setSubmitting}) => {
             if (loading) return;
             setLoading(true);
-            authService.createStaff(values.firstName, values.lastName, values.identityNumber, values.phoneNumber, values.username, values.departmentName)
-                .then(response => {
-                    setToastMessage({header: "Başarılı", content: "Sisteme Başarıyla Giriş Yapıldı."});
+            authService.createStaff({
+                firstName: values.firstName,
+                lastName: values.lastName,
+                identityNumber: values.identityNumber,
+                phoneNumber: values.phoneNumber,
+                username: values.username,
+                province:values.province,
+                departmentName: values.departmentName
+            })
+                .then(() => {
+                    setToastMessage({header: "Başarılı", content: "Sisteme Başarıyla Kaydınız Yapıldı."});
                     setShowToast(true);
                     setTimeout(() => {
                         navigate("/login");
@@ -48,7 +75,7 @@ function SignUp() {
                 }).catch(error => {
                 let errorMessage;
                 if (error.response && error.response.status === 401) {
-                    errorMessage = "Geçersiz TCKN/E-posta veya şifre";
+                    errorMessage = "Geçersiz T.C Kimlik Numarası veya şifre";
                 } else {
                     errorMessage = "Bir hata oluştu, lütfen tekrar deneyiniz." + error;
                 }
@@ -154,7 +181,7 @@ function SignUp() {
                     ) : null}
                 </div>
                 <div className="input-group mb-3 w-100">
-                    <label className="input-group-text" htmlFor="departmentName">Kurumunuz</label>
+                    <label className="input-group-text" htmlFor="departmentName">Çalıştığınız Birim</label>
                     <select
                         className="form-select"
                         id="departmentName"
@@ -172,6 +199,26 @@ function SignUp() {
                         <option value="COAST_GUARD" disabled={true}>SAHİL GÜVENLİK</option>
                     </select>
                 </div>
+                <div className="input-group mb-3 w-100">
+                    <label className="input-group-text" htmlFor="province">Görev Aldığınız İl</label>
+                    <input
+                        className="form-control w-75"
+                        list="staffProvincelist"
+                        id="staffProvincelistInput"
+                        placeholder="İl Seçiniz..."
+                        value={formik.values.province}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        name="province"
+                        disabled={false}
+                    />
+                    <datalist id="staffProvincelist">
+                        {province.length > 0 && province.map((city, index) => (
+                            <option key={index} value={city}/>
+                        ))}
+                    </datalist>
+                </div>
+
 
                 <button
                     type="submit"

@@ -1,31 +1,35 @@
 import {useState} from 'react';
 import {VscNewFile} from 'react-icons/vsc';
 import EventDetails from "./eventDetails.jsx";
-import NewEventService from "../services/newEventService.js";
 import {Button, Modal} from "react-bootstrap";
+import IncidentService from "../services/incidentService.js";
 
 function EventArea() {
     const [key, setKey] = useState('home');
     const [tabs, setTabs] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [modalTitle, setModalTitle] = useState("");
-    const [modalContent, setModalContent] = useState("");
 
-    const dataService = new NewEventService();
-    const dataSet = dataService.generateData();
+    const dataSet = new IncidentService()
 
-    const addNewTab = (data) => {
-        const newTabId = data.createId;
-        const newTab = {
-            id: newTabId,
-            title: `Vaka Nu: ${newTabId}`,
-            content: `Vaka ${newTabId} içeriği burada görünecek.`,
-            data
-        };
-        setTabs([...tabs, newTab]);
-        setKey(newTabId);
-        // setData(data);
+    const addNewTab = async () => {
+        try {
+            const response = await dataSet.create();
+            const newData = response.data.data;
+            const newTabId = newData.id;
+            const newTab = {
+                id: newTabId,
+                title: `Vaka Nu: ${newTabId}`,
+                content: `Vaka ${newTabId} içeriği burada görünecek.`,
+                data: newData
+            };
+            setTabs([...tabs, newTab]);
+            setKey(newTabId);
+        } catch (error) {
+            console.log(error);
+        }
     };
+
 
     const removeTab = (tabId) => {
         setTabs(prevTabs => {
@@ -89,7 +93,7 @@ function EventArea() {
                         className="nav-link user-select-none"
                         id="new-tab-btn"
                         type="button"
-                        onClick={() => addNewTab(dataSet)}
+                        onClick={() => addNewTab()}
                     >
                         <VscNewFile size={"24px"}/>Yeni Vaka
                     </button>
@@ -121,7 +125,7 @@ function EventArea() {
                 <Modal.Header closeButton>
                     <Modal.Title>{modalTitle}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>{modalContent}</Modal.Body>
+                <Modal.Body>Modal Contenttt :)</Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
                         Kapat

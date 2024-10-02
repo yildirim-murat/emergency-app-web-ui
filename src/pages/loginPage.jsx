@@ -28,7 +28,7 @@ function LoginPage() {
             password: '',
         },
         validationSchema: Yup.object({
-            tcknOrEmail: Yup.string().required("TCKN veya E-posta gereklidir"),
+            tcknOrEmail: Yup.string().required("T.C Kimlik Numarası gereklidir"),
             password: Yup.string().min(6, "Şifre en az 6 karakter olmalıdır").required("Şifre gereklidir"),
         }),
         onSubmit: async (values, {setSubmitting}) => {
@@ -38,17 +38,20 @@ function LoginPage() {
                 .then(response => {
                     setToastMessage({header: "Başarılı", content: "Sisteme Başarıyla Giriş Yapıldı."});
                     setShowToast(true);
-                    localStorage.setItem("user", JSON.stringify(response.data.data));
                     setToken(response.headers.authorization);
                     dispatch(syncUser(response.data.data));
                     setTimeout(() => {
                         navigate("/main");
                         setLoading(false)
                     }, 3000);
+
+                    authService.getData(values.tcknOrEmail, response.headers.authorization)
+                        .then(response => {localStorage.setItem("user", JSON.stringify(response));})
+
                 }).catch(error => {
                 let errorMessage;
                 if (error.response && error.response.status === 401) {
-                    errorMessage = "Geçersiz TCKN/E-posta veya şifre";
+                    errorMessage = "Geçersiz T.C Kimlik Numarası veya şifre";
                 } else {
                     errorMessage = "Bir hata oluştu, lütfen tekrar deneyiniz." + error;
                 }
