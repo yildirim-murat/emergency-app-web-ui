@@ -33,9 +33,7 @@ function EventDetails({data, removeTab}) {
         mistake: false,
         otherReason: ""
     });
-
     const service = new IncidentService();
-
 
     useEffect(() => {
         window.addEventListener('keydown', handleF9Press);
@@ -43,7 +41,6 @@ function EventDetails({data, removeTab}) {
             window.removeEventListener('keydown', handleF9Press);
         };
     }, []);
-
     useEffect(() => {
         if (showModal && modalRef.current) {
             const modalInstance = new window.bootstrap.Modal(modalRef.current);
@@ -67,12 +64,11 @@ function EventDetails({data, removeTab}) {
             };
         }
     }, [showModal]);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await AddressService.getIncidents.getData();
-                setIncidents(response);
+                setIncidents(response.data);
             } catch (error) {
                 console.log("API request failed:", error);
             }
@@ -80,7 +76,6 @@ function EventDetails({data, removeTab}) {
 
         fetchData();
     }, []);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -93,26 +88,58 @@ function EventDetails({data, removeTab}) {
 
         fetchData();
     }, []);
+    useEffect(() => {
+
+        const definitionSubDefinitionMap = {};
+
+        // console.log("IncidentList " + JSON.stringify(incidentsList))
+        incidentsList.forEach(item => {
+            if (item.definition) {
+                if (!definitionSubDefinitionMap[item.definition]) {
+                    definitionSubDefinitionMap[item.definition] = [];
+                }
+                if (item.subDefinition && !definitionSubDefinitionMap[item.definition].includes(item.subDefinition)) {
+                    definitionSubDefinitionMap[item.definition].push(item.subDefinition);
+                }
+            }
+        });
+        setKeyList(definitionSubDefinitionMap);
+    }, [incidentsList]);
 
     useEffect(() => {
-        if (incidentsList.length > 0) {
-            const uniqueKeys = new Set();
+        if (incidents) {
+            const flattenedIncidents = incidents.map(item => {
+                const [key, value] = Object.entries(item)[0];
+                return { definition: key, subDefinition: value };
+            });
 
-            incidentsList.forEach(item => {
-                    Object.keys(item).forEach(key => {
-                        uniqueKeys.add(key)
-                    })
-                }
-            )
-            setKeyList(Array.from(uniqueKeys));
+            setIncidentsList(flattenedIncidents);
         }
+    }, [incidents]);
+    useEffect(() => {
+        const textAreaAddress = document.getElementById('caseDescription');
+        updateAddressCharCount();
+        textAreaAddress.addEventListener('input', updateAddressCharCount);
+        return () => {
+            textAreaAddress.removeEventListener('input', updateAddressCharCount);
+        };
+    }, []);
+    useEffect(() => {
+        if (triggerUpdate) {
+            updateAddressCharCount();
+        }
+    }, [triggerUpdate]);
 
-    }, [incidentsList]);
+    function updateAddressCharCount() {
+        const textAreaAddress = document.getElementById('caseDescription');
+        const currentLength = textAreaAddress.value.length;
+        const remainingChars = textAreaAddress.maxLength - currentLength;
+        setCharCount(remainingChars);
+    }
 
     const handleDepartmentSelectionChange = (selected) => {
         setSelectedDepartments(selected.inNumber);
     };
-
     const handleChangeRadio = (event) => {
         const id = event.target.id;
 
@@ -122,9 +149,9 @@ function EventDetails({data, removeTab}) {
             setReason({typeName: "cancelledForm", consultation: true, mistake: false, otherReason: ''});
         }
     }
-
     const sendForm = () => {
-        setReason({typeName:"saved",mistake: false,consultation: false, otherReason: ''});
+        setTriggerUpdate(prevState => prevState + 1);
+        setReason({typeName: "saved", mistake: false, consultation: false, otherReason: ''});
         setShowModal(false)
         const callNumber = document.getElementById("calledNumber").value;
         if (selectedHeaders.length > 0 && selectedDepartments > 0 && callNumber.length > 0) {
@@ -134,18 +161,19 @@ function EventDetails({data, removeTab}) {
                 calledNumber: phoneNumber,
                 address: addressData,
                 description: caseDescription,
-                selectedHeaders: selectedHeaders,
-                selectedSubItems: selectedSubItems,
+                definition: selectedHeaders.join(", "),
+                subDefinition: Object.entries(selectedSubItems)
+                    .map(([header, subItems]) => `${header}: ${subItems.join(", ")}`)
+                    .join("; "),
                 selectedDepartments: selectedDepartments,
             }
             try {
-                service.savedForm(sendData).then(() => console.log(" "));
+                service.savedForm(sendData).then(() => console.log("Veriler Başarılı Şekilde Gönderildi."));
                 removeTab();
-            }catch(error) {
+            } catch (error) {
                 setMessage({title: "Hata", content: `Veriler Kaydedilirken Hata Oluştu. Hata: ${error}`});
                 setShowModal(true)
             }
-
         } else {
             let errorMessage;
             if (selectedHeaders.length < 1 && selectedDepartments === 0 && callNumber.length === 0) {
@@ -238,7 +266,7 @@ function EventDetails({data, removeTab}) {
             }
         }
     };
-    const handleCloseModal = async() => {
+    const handleCloseModal = async () => {
         if (reason.typeName === "cancelledForm") {
             if (!reason.consultation && !reason.mistake) {
                 alert("Lütfen Seçim Yapınız!")
@@ -247,7 +275,7 @@ function EventDetails({data, removeTab}) {
             }
 
             try {
-                await  service.cancelledForm(reason, data.id);
+                await service.cancelledForm(reason, data.id);
                 removeTab();
             } catch (err) {
                 console.log("Error saving form: " + err);
@@ -257,25 +285,9 @@ function EventDetails({data, removeTab}) {
         setShowModal(false);
         setMessage({title: "", content: ""});
     }
-
-    useEffect(() => {
-        if (incidents) {
-            Object.values(incidents).forEach(value => {
-                if (Array.isArray(value)) {
-                    setIncidentsList(value)
-                }
-            });
-        }
-    }, [incidents]);
-
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value.toUpperCase());
     }
-
-    const filteredList = keyList.filter(item =>
-        item.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     const handleHeaderSelect = (header, isSelected) => {
         setSelectedHeaders(prev =>
             isSelected ? [...prev, header] : prev.filter(h => h !== header)
@@ -289,7 +301,6 @@ function EventDetails({data, removeTab}) {
             });
         }
     };
-
     const handleSubItemSelect = (header, subItem, isSelected) => {
         setSelectedSubItems(prev => {
             const updated = {...prev};
@@ -312,7 +323,6 @@ function EventDetails({data, removeTab}) {
             handleHeaderSelect(header, true);
         }
     };
-
     const formatDateTime = (dateTime) => {
         let dateObject = new Date(dateTime);
 
@@ -334,50 +344,23 @@ function EventDetails({data, removeTab}) {
             time: formattedTime
         };
     }
-
-    const province = JSON.parse(sessionStorage.getItem("province"));
-
     const handleProvinceChange = (event) => {
         setSelectedProvince(event.target.value);
     }
-
-    useEffect(() => {
-        const textAreaAddress = document.getElementById('caseDescription');
-        updateAddressCharCount();
-        textAreaAddress.addEventListener('input', updateAddressCharCount);
-        return () => {
-            textAreaAddress.removeEventListener('input', updateAddressCharCount);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (triggerUpdate) {
-            updateAddressCharCount();
-        }
-    }, [triggerUpdate]);
-
-    function updateAddressCharCount() {
-        const textAreaAddress = document.getElementById('caseDescription');
-        const currentLength = textAreaAddress.value.length;
-        const remainingChars = textAreaAddress.maxLength - currentLength;
-        setCharCount(remainingChars);
-    }
-
     const receiveDataPriority = (newData) => {
         setPriorityData((prevData) => ({...prevData, newData}));
     }
-
     const handleAddressValue = (newData) => {
         setAddressData(newData);
     }
-
     const handlePhoneNumber = (e) => {
         setPhoneNumber(e.target.value);
     }
-
     const handleCaseDescChange = (e) => {
         setCaseDescription(e.target.value);
     }
+    const province = JSON.parse(sessionStorage.getItem("province"));
+    const filteredList = Object.keys(keyList).filter(item => item.toLowerCase().includes(searchTerm.toLowerCase()));
 
     return (
         <div className="row overflow-hidden m-0" style={{height: "79vh", width: "83vw"}}>
@@ -448,6 +431,7 @@ function EventDetails({data, removeTab}) {
                                                     key={key + 1}
                                                     index={key + 1}
                                                     content={item}
+                                                    subDefinitions={keyList[item]}
                                                     incidentsList={incidentsList}
                                                     onHeaderSelect={handleHeaderSelect}
                                                     onSubItemSelect={handleSubItemSelect}
@@ -517,7 +501,7 @@ function EventDetails({data, removeTab}) {
                         id={"calledNumber"}
                         onChange={handlePhoneNumber}
                     />
-                    <Address province={selectedProvince} addressData={handleAddressValue}
+                    <Address  onAddressChange={handleAddressValue}
                              triggerUpdate={triggerUpdate}/>
                     <div className="row w-100 ps-3">
                         <div className="btn btn-danger" onClick={() => {

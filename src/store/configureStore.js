@@ -1,10 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit';
+import {configureStore} from '@reduxjs/toolkit';
 import rootReducer from './rootReducer.js';
 
 const store = configureStore({
     reducer: rootReducer,
-    // middleware: (getDefaultMiddleware) => getDefaultMiddleware(), // Gerekirse middleware ekleyin
-    // devTools: process.env.NODE_ENV !== 'production', // Geliştirici araçlarını etkinleştirin
+    // middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+    devTools: process.env.NODE_ENV !== 'production',
 });
 
 export default store;

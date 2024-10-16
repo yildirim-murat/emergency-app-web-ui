@@ -13,22 +13,18 @@ function Dashboard() {
     const [inCall, setInCall] = useState(false);
     const [isConnected, setIsConnected] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
-
     const handleCloseModal = () => {
         setShowModal(false);
         setInCall(true);
         setAcceptData(false);
         setIsPlaying(true);
     }
-
     const isPlayingHandle = (value) => {
         setIsPlaying(value);
     }
-
     const onCall = (value) => {
         setInCall(value);
     }
-
     const handleAcceptData = (value) => {
         setAcceptData(value);
     }
@@ -36,7 +32,7 @@ function Dashboard() {
     return (
         <div>
             <Navbar/>
-            <InformationBar setSelectedOption={setAcceptData} inCall={true} setIsConnected={setIsConnected} />
+            <InformationBar setSelectedOption={setAcceptData} inCall={false} setIsConnected={setIsConnected}/>
             <div className="d-flex row">
                 <div className="col-2" style={{minWidth: "300px", height: "85vh"}}>
                     <Aside calledNu={""}
@@ -54,6 +50,7 @@ function Dashboard() {
                     <EventArea/>
                 </div>
             </div>
+
             <div className="modal fade" ref={modalRef} id="staticCallModal" data-bs-backdrop="static"
                  data-bs-keyboard="false"
                  tabIndex="-1" aria-labelledby="callModal" aria-hidden="true">
@@ -71,8 +68,7 @@ function Dashboard() {
                                     data-bs-dismiss="modal"
                                     onClick={
                                         () => handleCloseModal()
-                                    }
-                            >
+                                    }>
                                 Cevapla
                             </button>
                         </div>

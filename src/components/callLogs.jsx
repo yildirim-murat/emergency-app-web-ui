@@ -28,7 +28,7 @@ function CallLogs({isSmall}) {
                              height: "100%",
                              borderRadius: "5px"
                          }}>
-                        <div className="row text-center p-0 m-0">
+                        <div className="row text-center p-0 m-0" style={{height: "20px"}}>
                             <div className="btn w-50 align-content-center btn-outline-secondary"
                                  style={{fontSize: "10px"}} >Çağrıyı İlişkilendir (F9)
                             </div>
@@ -36,9 +36,9 @@ function CallLogs({isSmall}) {
                                  style={{fontSize: "10px"}}>Çağrıyı Kaldır
                             </div>
                         </div>
-                        <table>
+                        <table style={{height: "10px"}}>
                             <thead>
-                            <tr className="text-center">
+                            <tr className="text-center h-100" >
                                 <th scope="col" className={"sticky-top bg-white"}
                                     style={{
                                         zIndex: "1"
@@ -71,141 +71,17 @@ function CallLogs({isSmall}) {
                             </thead>
                             <tbody className={"text-center"}>
                             <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>- -</td>
                                 <td><HiPhoneIncoming size={"16px"} color={"green"}/></td>
                             </tr>
                             <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>- -</td>
                                 <td><HiMiniPhoneArrowUpRight size={"16px"} color={"blue"}/></td>
                             </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiPhoneIncoming size={"16px"} color={"green"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiMiniPhoneArrowUpRight size={"16px"} color={"blue"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiPhoneIncoming size={"16px"} color={"green"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiMiniPhoneArrowUpRight size={"16px"} color={"blue"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiPhoneIncoming size={"16px"} color={"green"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiMiniPhoneArrowUpRight size={"16px"} color={"blue"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiPhoneIncoming size={"16px"} color={"green"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiMiniPhoneArrowUpRight size={"16px"} color={"blue"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiPhoneIncoming size={"16px"} color={"green"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiMiniPhoneArrowUpRight size={"16px"} color={"blue"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiPhoneIncoming size={"16px"} color={"green"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiMiniPhoneArrowUpRight size={"16px"} color={"blue"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiPhoneIncoming size={"16px"} color={"green"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiMiniPhoneArrowUpRight size={"16px"} color={"blue"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiPhoneIncoming size={"16px"} color={"green"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiMiniPhoneArrowUpRight size={"16px"} color={"blue"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiPhoneIncoming size={"16px"} color={"green"}/></td>
-                            </tr>
-                            <tr>
-                                <td>6425426</td>
-                                <td>03121120000</td>
-                                <td>01.01.2025 12:34:56</td>
-                                <td><HiMiniPhoneArrowUpRight size={"16px"} color={"blue"}/></td>
-                            </tr>
-                            {/*{data.callHistory.map((call, index) => (*/}
-                            {/*    <tr key={index}>*/}
-                            {/*        <td>{call.callId}</td>*/}
-                            {/*        <td>{call.number}</td>*/}
-                            {/*        <td>{new Date(call.callTime).toLocaleString()}</td>*/}
-                            {/*        <td>{call["lat-lot"]}</td>*/}
-                            {/*        <td>{call["call-location"]}</td>*/}
-                            {/*        <td className={"d-flex justify-content-center"}>*/}
-                            {/*            <div className="form-check">*/}
-                            {/*                <input className="form-check-input " type="checkbox"*/}
-                            {/*                       id={`checkbox-${index}`} defaultChecked={call["call-attribution"]}*/}
-                            {/*                />*/}
-                            {/*            </div>*/}
-                            {/*        </td>*/}
-                            {/*    </tr>*/}
-                            {/*))}*/}
                             </tbody>
                         </table>
                     </div>) : (<div className="row overflow-x-hidden overflow-y-auto"

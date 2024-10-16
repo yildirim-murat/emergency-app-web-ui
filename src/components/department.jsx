@@ -7,14 +7,12 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import {MASKS} from "../utils/departmentUtils.js";
 
-
-
 function Department({ isSmall, onSelectionChange }) {
     const [selectedMask, setSelectedMask] = useState(0);
 
     useEffect(() => {
         onSelectionChange({inNumber: selectedMask});
-    }, [selectedMask]);
+    }, [onSelectionChange, selectedMask]);
 
     const handleCheckboxChange = (event) => {
         const { id, checked } = event.target;
@@ -32,7 +30,7 @@ function Department({ isSmall, onSelectionChange }) {
             <div className="d-flex h-100 p-0 m-0 mt-4 w-100 flex-wrap align-items-center justify-content-center">
                 <input type="checkbox" className="btn-check" id="police" autoComplete="off" onChange={handleCheckboxChange} />
                 <label className="btn btn-danger mt-1 me-1 w-50 text-start align-content-center" htmlFor="police" style={{ height: '11%', fontSize: "20px" }}>
-                    <RiPoliceBadgeLine size={"20px"} /> Emniyet
+                    <RiPoliceBadgeLine size={"16px"} /> Emniyet
                 </label>
 
                 <input type="checkbox" className="btn-check" id="health" autoComplete="off" onChange={handleCheckboxChange} />
@@ -100,7 +98,7 @@ function Department({ isSmall, onSelectionChange }) {
 
 Department.propTypes = {
     isSmall: PropTypes.bool.isRequired,
-    onSelectionChange: PropTypes.func.isRequired,
+    onSelectionChange: PropTypes.func,
 };
 
 export default Department;

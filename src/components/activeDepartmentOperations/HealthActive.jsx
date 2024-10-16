@@ -10,6 +10,12 @@ function HealthActive() {
     const [exitKm, setExitKm] = useState(0);
     const [entryKm, setEntryKm] = useState(0);
     const [diffKm, setDiffKm] = useState(0);
+    const [crewName, setCrewName] = useState("");
+    const [crewList, setCrewList] = useState([]);
+    const [isEditing, setIsEditing] = useState(null);
+    const [updatedCrewName, setUpdatedCrewName] = useState('');
+    const [selectedCrew, setSelectedCrew] = useState(null);
+    const [selectedCrewDetails, setSelectedCrewDetails] = useState({});
 
     useEffect(() => {
             let difference = entryKm - exitKm
@@ -17,9 +23,7 @@ function HealthActive() {
                 difference = 0;
             }
             setDiffKm(difference)
-        }, [exitKm, entryKm]
-    )
-
+        }, [exitKm, entryKm])
 
     const handleButtonClick = (inputId) => {
         const now = new Date();
@@ -32,10 +36,32 @@ function HealthActive() {
 
         document.getElementById(inputId).value = `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
     };
-
     const handleRemoveInput = (inputId) => {
         document.getElementById(inputId).value = '';
     }
+    const handleSave = () => {
+        if (crewName.trim()) {
+            setCrewList([...crewList, crewName]);
+            setCrewName('');
+        }
+    };
+    const handleCrewClick = (crewName) => {
+        const selected = crewList.find((crew) => crew === crewName);
+        if (selected) {
+            setSelectedCrew(selected);
+            setSelectedCrewDetails({ name: selected, vehicle: '' });
+        }
+    };
+    const handleEditClick = (index) => {
+        setIsEditing(index);
+        setUpdatedCrewName(crewList[index]);
+    };
+    const handleUpdateSave = (index) => {
+        const updatedList = [...crewList];
+        updatedList[index] = updatedCrewName;
+        setCrewList(updatedList);
+        setIsEditing(null);
+    };
 
     return (
         <div className="d-flex align-items-start w-100 h-100 overflow-hidden">
@@ -58,32 +84,22 @@ function HealthActive() {
                      aria-labelledby="v-pills-base-tab" tabIndex="0">
                     <div className="row w-100 h-100">
                         <div className="col-3">
-                            <div className="row">
-                                <div className="mb-3">
-                                    <input type="email" className="form-control" id="crewSearch"
-                                           placeholder="Ekip Ara"/>
+                            <div className="row mb-3">
+                                <div className="col-8">
+                                    <input type="text"
+                                           className="form-control"
+                                           id="crewSearch"
+                                           placeholder="Ekip Adı Ekle"
+                                           value={crewName}
+                                           onChange={(e) => setCrewName(e.target.value)}/>
+                                </div>
+                                <div className="col-2">
+                                    <button type={"button"} className={"btn btn-warning"} onClick={handleSave}>
+                                        Kaydet
+                                    </button>
                                 </div>
                             </div>
-                            <div className="row h-75">
-                                <table className="table h-100">
-                                    <tbody>
-                                    <tr className={"align-items-start"}>
-                                        {/*{filteredList.map((item, key) => (*/}
-                                        {/*    <AccordionRow*/}
-                                        {/*        key={key + 1}*/}
-                                        {/*        index={key + 1}*/}
-                                        {/*        content={item}*/}
-                                        {/*        incidentsList={incidentsList}*/}
-                                        {/*        onHeaderSelect={handleHeaderSelect}*/}
-                                        {/*        onSubItemSelect={handleSubItemSelect}*/}
-                                        {/*        selectedHeaders={selectedHeaders}*/}
-                                        {/*        selectedSubItems={selectedSubItems[item] || []}*/}
-                                        {/*    />*/}
-                                        {/*))}*/}
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <div className="row h-75"></div>
                         </div>
                         <div className="col-4 text-center">Atanmış Ekipler
                             <table>
@@ -97,291 +113,296 @@ function HealthActive() {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>6215 Çankaya 21 Nolu</td>
-                                    <td>
-                                        <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" value=""
-                                                   id="crewAssigned"/>
-                                        </div>
-                                    </td>
-                                    <td><FaLocationArrow size={"24px"} style={{cursor: "pointer"}}/></td>
-                                    <td><FiEdit3 size={"24px"} style={{cursor: "pointer"}}/></td>
-                                    <td><TbHospital size={"24px"} style={{cursor: "pointer"}}/></td>
-                                </tr>
-                                <tr>
-                                    <td>6215 Çankaya 21 Nolu</td>
-                                    <td>
-                                        <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" value=""
-                                                   id="crewAssigned"/>
-                                        </div>
-                                    </td>
-                                    <td><FaLocationArrow size={"24px"} style={{cursor: "pointer"}}/></td>
-                                    <td><FiEdit3 size={"24px"} style={{cursor: "pointer"}}/></td>
-                                    <td><TbHospital size={"24px"} style={{cursor: "pointer"}}/></td>
-                                </tr>
-                                <tr>
-                                    <td>6215 Çankaya 21 Nolu</td>
-                                    <td>
-                                        <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" value=""
-                                                   id="crewAssigned"/>
-                                        </div>
-                                    </td>
-                                    <td><FaLocationArrow size={"24px"} style={{cursor: "pointer"}}/></td>
-                                    <td><FiEdit3 size={"24px"} style={{cursor: "pointer"}}/></td>
-                                    <td><TbHospital size={"24px"} style={{cursor: "pointer"}}/></td>
-                                </tr>
-                                <tr>
-                                    <td>6215 Çankaya 21 Nolu</td>
-                                    <td>
-                                        <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" value=""
-                                                   id="crewAssigned"/>
-                                        </div>
-                                    </td>
-                                    <td><FaLocationArrow size={"24px"} style={{cursor: "pointer"}}/></td>
-                                    <td><FiEdit3 size={"24px"} style={{cursor: "pointer"}}/></td>
-                                    <td><TbHospital size={"24px"} style={{cursor: "pointer"}}/></td>
-                                </tr>
-                                <tr>
-                                    <td>6215 Çankaya 21 Nolu</td>
-                                    <td>
-                                        <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" value=""
-                                                   id="crewAssigned"/>
-                                        </div>
-                                    </td>
-                                    <td><FaLocationArrow size={"24px"} style={{cursor: "pointer"}}/></td>
-                                    <td><FiEdit3 size={"24px"} style={{cursor: "pointer"}}/></td>
-                                    <td><TbHospital size={"24px"} style={{cursor: "pointer"}}/></td>
-                                </tr>
+                                {
+                                    crewList.map((crew, index) => (
+                                        <tr key={index}>
+                                            <td onClick={() => handleCrewClick(crew)} style={{cursor: 'pointer'}}>
+                                                {isEditing === index ? (
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        value={updatedCrewName}
+                                                        onChange={(e) => setUpdatedCrewName(e.target.value)}
+                                                    />
+                                                ) : (
+                                                    crew
+                                                )}
+                                            </td>
+                                            <td>
+                                            <div className="form-check">
+                                                    <input className="form-check-input" type="checkbox" value=""/>
+                                                </div>
+                                            </td>
+                                            <td><FaLocationArrow size={"24px"} style={{cursor: "pointer"}}/></td>
+                                            <td>
+                                                {isEditing === index ? (
+                                                    <button
+                                                        className="btn btn-success"
+                                                        onClick={() => handleUpdateSave(index)}
+                                                    >
+                                                        Kaydet
+                                                    </button>
+                                                ) : (
+                                                    <FiEdit3
+                                                        size={"24px"}
+                                                        style={{cursor: "pointer"}}
+                                                        onClick={() => handleEditClick(index)}
+                                                    />
+                                                )}
+                                            </td>
+                                            <td><TbHospital size={"24px"} style={{cursor: "pointer"}}/></td>
+                                        </tr>
+                                    ))
+                                }
                                 </tbody>
                             </table>
                         </div>
                         <div className="col-5 align-items-center  overflow-y-auto"
-                             style={{fontSize: "12px", height: "97%"}}>Ekip Kayıt Bilgileri
-                            <div className="col-12 h-100">
-                                <div className="row">
-                                    <div className="col-4">Ekip Adı</div>
-                                    <div className="col-3">213</div>
-                                    <div className="col-5">
-                                        <button className="btn btn-outline-danger px-2 m-0 w-100" type="button"
-                                                id="saveTime" style={{height: "32px", fontSize: "13px"}}><IoIosSave
-                                            size={"24px"}/>Zamanları Kaydet
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-4">Araç Plakası</div>
-                                    <div className="col-8">06ABC123</div>
-                                </div>
-                                <div className="row align-items-center">
-                                    <div className="col-4">Ekip Atama Zamanı:</div>
-                                    <div className="col-8">
-                                        <div className="input-group mb-3">
-                                            <input type="text" className="form-control"
-                                                   aria-describedby="deploymentIncidentBtn" id={"deploymentIncident"}
-                                                   style={{height: "32px"}} readOnly/>
-                                            <button className="btn btn-outline-success py-0 m-0" type="button"
-                                                    id="deploymentIncidentBtn" style={{height: "32px"}}
-                                                    onClick={() => handleButtonClick("deploymentIncident")}><RxLapTimer
-                                                size={"18px"}/>
-                                            </button>
-                                            <button className="btn btn-outline-danger py-0 m-0" type="button"
-                                                    id="deploymentIncidentBtn" style={{height: "32px"}}
-                                                    onClick={() => handleRemoveInput("deploymentIncident")}>
-                                                <RiDeleteBin5Line size={"18px"}/>
-                                            </button>
+                             style={{fontSize: "12px", height: "97%"}}>
+                            Ekip Kayıt Bilgileri
+                            {
+                                selectedCrew ? (
+                                        <div className="col-12 h-100">
+                                            <div className="row">
+                                                <div className="col-4">Ekip Adı</div>
+                                                <div className="col-3">
+                                                    <strong>
+                                                        {selectedCrewDetails.name}
+                                                    </strong>
+                                                </div>
+                                                <div className="col-5">
+                                                    <button className="btn btn-outline-danger px-2 m-0 w-100" type="button"
+                                                            id="saveTime" style={{height: "32px", fontSize: "13px"}}>
+                                                        <IoIosSave
+                                                            size={"24px"}/>Zamanları Kaydet
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="row">
+                                                <div className="col-4">Araç Plakası</div>
+                                                <div className="col-8">N/A</div>
+                                            </div>
+                                            <div className="row align-items-center">
+                                                <div className="col-4">Ekip Atama Zamanı:</div>
+                                                <div className="col-8">
+                                                    <div className="input-group mb-3">
+                                                        <input type="text" className="form-control"
+                                                               aria-describedby="deploymentIncidentBtn"
+                                                               id={"deploymentIncident"}
+                                                               style={{height: "32px"}} readOnly/>
+                                                        <button className="btn btn-outline-success py-0 m-0" type="button"
+                                                                id="deploymentIncidentBtn" style={{height: "32px"}}
+                                                                onClick={() => handleButtonClick("deploymentIncident")}>
+                                                            <RxLapTimer
+                                                                size={"18px"}/>
+                                                        </button>
+                                                        <button className="btn btn-outline-danger py-0 m-0" type="button"
+                                                                id="deploymentIncidentBtn" style={{height: "32px"}}
+                                                                onClick={() => handleRemoveInput("deploymentIncident")}>
+                                                            <RiDeleteBin5Line size={"18px"}/>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="row ps-5 user-select-none">
+                                                <div className="form-check col-4">
+                                                    <input className="form-check-input" type="radio" name="regionType"
+                                                           id="inRegion"/>
+                                                    <label className="form-check-label" htmlFor="inRegion">
+                                                        Bölge İçi
+                                                    </label>
+                                                </div>
+                                                <div className="form-check col-4">
+                                                    <input className="form-check-input" type="radio" name="regionType"
+                                                           id="outRegion"/>
+                                                    <label className="form-check-label" htmlFor="outRegion">
+                                                        Bölge Dışı
+                                                    </label>
+                                                </div>
+                                                <div className="form-check col-4">
+                                                    <input className="form-check-input" type="radio" name="regionType"
+                                                           id="outProvince"/>
+                                                    <label className="form-check-label" htmlFor="outProvince">
+                                                        İl Dışı
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div className="row align-items-center text-center"
+                                                 style={{fontSize: "10px"}}>
+                                                <div className="col-2">Çıkış km:</div>
+                                                <div className="col-3">
+                                                    <input type="text" className="form-control" id="exitKm"
+                                                           style={{fontSize: "10px"}}
+                                                           onChange={(e) => setExitKm(e.target.value)}/>
+                                                </div>
+                                                <div className="col-2">Dönüş km:</div>
+                                                <div className="col-3">
+                                                    <input type="text" className="form-control" id="entryKm"
+                                                           style={{fontSize: "10px"}}
+                                                           onChange={(e) => setEntryKm(e.target.value)}/>
+                                                </div>
+                                                <div className="col-2">= <span style={{
+                                                    borderColor: "red",
+                                                    borderStyle: "dashed",
+                                                    borderWidth: "0 0 0.5px 0"
+                                                }}>{diffKm}</span> km
+                                                </div>
+                                            </div>
+                                            <div className="row align-items-center">
+                                                <div className="col-4">Vakaya Çıkış:</div>
+                                                <div className="col-8">
+                                                    <div className="input-group mb-1">
+                                                        <input type="text" className="form-control"
+                                                               aria-describedby="releaseIncidentBtn" id={"releaseIncident"}
+                                                               style={{height: "32px"}} readOnly/>
+                                                        <button className="btn btn-outline-success py-0 m-0" type="button"
+                                                                id="releaseIncidentBtn" style={{height: "32px"}}
+                                                                onClick={() => handleButtonClick("releaseIncident")}>
+                                                            <RxLapTimer
+                                                                size={"18px"}/>
+                                                        </button>
+                                                        <button className="btn btn-outline-danger py-0 m-0" type="button"
+                                                                id="deploymentIncidentBtn" style={{height: "32px"}}
+                                                                onClick={() => handleRemoveInput("releaseIncident")}>
+                                                            <RiDeleteBin5Line size={"18px"}/>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="row align-items-center">
+                                                <div className="col-4">Olay Yerine Varış:</div>
+                                                <div className="col-8">
+                                                    <div className="input-group mb-1">
+                                                        <input type="text" className="form-control"
+                                                               aria-describedby="arrivalSceneBtn" id={"arrivalScene"}
+                                                               style={{height: "32px"}} readOnly/>
+                                                        <button className="btn btn-outline-success py-0 m-0" type="button"
+                                                                id="arrivalSceneBtn" style={{height: "32px"}}
+                                                                onClick={() => handleButtonClick("arrivalScene")}>
+                                                            <RxLapTimer
+                                                                size={"18px"}/>
+                                                        </button>
+                                                        <button className="btn btn-outline-danger py-0 m-0" type="button"
+                                                                id="deploymentIncidentBtn" style={{height: "32px"}}
+                                                                onClick={() => handleRemoveInput("arrivalScene")}>
+                                                            <RiDeleteBin5Line size={"18px"}/>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="row align-items-center">
+                                                <div className="col-4">Vakaya Varış:</div>
+                                                <div className="col-8">
+                                                    <div className="input-group mb-1">
+                                                        <input type="text" className="form-control"
+                                                               aria-describedby="arrivalIncidentBtn" id={"arrivalIncident"}
+                                                               style={{height: "32px"}} readOnly/>
+                                                        <button className="btn btn-outline-success py-0 m-0" type="button"
+                                                                id="arrivalIncidentBtn" style={{height: "32px"}}
+                                                                onClick={() => handleButtonClick("arrivalIncident")}>
+                                                            <RxLapTimer
+                                                                size={"18px"}/>
+                                                        </button>
+                                                        <button className="btn btn-outline-danger py-0 m-0" type="button"
+                                                                id="deploymentIncidentBtn" style={{height: "32px"}}
+                                                                onClick={() => handleRemoveInput("arrivalIncident")}>
+                                                            <RiDeleteBin5Line size={"18px"}/>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="row align-items-center">
+                                                <div className="col-4">Olay Yerinden Ayrılış:</div>
+                                                <div className="col-8">
+                                                    <div className="input-group mb-1">
+                                                        <input type="text" className="form-control"
+                                                               aria-describedby="departureSceneBtn" id={"departureScene"}
+                                                               style={{height: "32px"}} readOnly/>
+                                                        <button className="btn btn-outline-success py-0 m-0" type="button"
+                                                                id="departureSceneBtn" style={{height: "32px"}}
+                                                                onClick={() => handleButtonClick("departureScene")}>
+                                                            <RxLapTimer
+                                                                size={"18px"}/>
+                                                        </button>
+                                                        <button className="btn btn-outline-danger py-0 m-0" type="button"
+                                                                id="deploymentIncidentBtn" style={{height: "32px"}}
+                                                                onClick={() => handleRemoveInput("departureScene")}>
+                                                            <RiDeleteBin5Line size={"18px"}/>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="row align-items-center">
+                                                <div className="col-4">Hastaneye Varış:</div>
+                                                <div className="col-8">
+                                                    <div className="input-group mb-1">
+                                                        <input type="text" className="form-control"
+                                                               aria-describedby="arrivalHospitalBtn" id={"arrivalHospital"}
+                                                               style={{height: "32px"}} readOnly/>
+                                                        <button className="btn btn-outline-success py-0 m-0" type="button"
+                                                                id="arrivalHospitalBtn" style={{height: "32px"}}
+                                                                onClick={() => handleButtonClick("arrivalHospital")}>
+                                                            <RxLapTimer
+                                                                size={"18px"}/>
+                                                        </button>
+                                                        <button className="btn btn-outline-danger py-0 m-0" type="button"
+                                                                id="deploymentIncidentBtn" style={{height: "32px"}}
+                                                                onClick={() => handleRemoveInput("arrivalHospital")}>
+                                                            <RiDeleteBin5Line size={"18px"}/>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="row align-items-center">
+                                                <div className="col-4">Hastaneden Ayrılış:</div>
+                                                <div className="col-8">
+                                                    <div className="input-group mb-1">
+                                                        <input type="text" className="form-control"
+                                                               aria-describedby="departureHospitalBtn"
+                                                               id={"departureHospital"}
+                                                               style={{height: "32px"}} readOnly/>
+                                                        <button className="btn btn-outline-success py-0 m-0" type="button"
+                                                                id="departureHospitalBtn" style={{height: "32px"}}
+                                                                onClick={() => handleButtonClick("departureHospital")}>
+                                                            <RxLapTimer
+                                                                size={"18px"}/>
+                                                        </button>
+                                                        <button className="btn btn-outline-danger py-0 m-0" type="button"
+                                                                id="deploymentIncidentBtn" style={{height: "32px"}}
+                                                                onClick={() => handleRemoveInput("departureHospital")}>
+                                                            <RiDeleteBin5Line size={"18px"}/>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="row align-items-center">
+                                                <div className="col-4">İstasyona Varış:</div>
+                                                <div className="col-8">
+                                                    <div className="input-group mb-1">
+                                                        <input type="text" className="form-control"
+                                                               aria-describedby="arrivalStationBtn" id={"arrivalStation"}
+                                                               style={{height: "32px"}} readOnly/>
+                                                        <button className="btn btn-outline-success py-0 m-0" type="button"
+                                                                id="arrivalStationBtn" style={{height: "32px"}}
+                                                                onClick={() => handleButtonClick("arrivalStation")}>
+                                                            <RxLapTimer
+                                                                size={"18px"}/>
+                                                        </button>
+                                                        <button className="btn btn-outline-danger py-0 m-0" type="button"
+                                                                id="deploymentIncidentBtn" style={{height: "32px"}}
+                                                                onClick={() => handleRemoveInput("arrivalStation")}>
+                                                            <RiDeleteBin5Line size={"18px"}/>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div className="row ps-5 user-select-none">
-                                    <div className="form-check col-4">
-                                        <input className="form-check-input" type="radio" name="regionType"
-                                               id="inRegion"/>
-                                        <label className="form-check-label" htmlFor="inRegion">
-                                            Bölge İçi
-                                        </label>
-                                    </div>
-                                    <div className="form-check col-4">
-                                        <input className="form-check-input" type="radio" name="regionType"
-                                               id="outRegion"/>
-                                        <label className="form-check-label" htmlFor="outRegion">
-                                            Bölge Dışı
-                                        </label>
-                                    </div>
-                                    <div className="form-check col-4">
-                                        <input className="form-check-input" type="radio" name="regionType"
-                                               id="outProvince"/>
-                                        <label className="form-check-label" htmlFor="outProvince">
-                                            İl Dışı
-                                        </label>
-                                    </div>
-                                </div>
-                                <div className="row align-items-center text-center"
-                                     style={{fontSize: "10px"}}>
-                                    <div className="col-2">Çıkış km:</div>
-                                    <div className="col-3">
-                                        <input type="text" className="form-control" id="exitKm"
-                                               style={{fontSize: "10px"}} onChange={(e) => setExitKm(e.target.value)}/>
-                                    </div>
-                                    <div className="col-2">Dönüş km:</div>
-                                    <div className="col-3">
-                                        <input type="text" className="form-control" id="entryKm"
-                                               style={{fontSize: "10px"}} onChange={(e) => setEntryKm(e.target.value)}/>
-                                    </div>
-                                    <div className="col-2">= <span style={{
-                                        borderColor: "red",
-                                        borderStyle: "dashed",
-                                        borderWidth: "0 0 0.5px 0"
-                                    }}>{diffKm}</span> km
-                                    </div>
-                                </div>
-                                <div className="row align-items-center">
-                                    <div className="col-4">Vakaya Çıkış:</div>
-                                    <div className="col-8">
-                                        <div className="input-group mb-1">
-                                            <input type="text" className="form-control"
-                                                   aria-describedby="releaseIncidentBtn" id={"releaseIncident"}
-                                                   style={{height: "32px"}} readOnly/>
-                                            <button className="btn btn-outline-success py-0 m-0" type="button"
-                                                    id="releaseIncidentBtn" style={{height: "32px"}}
-                                                    onClick={() => handleButtonClick("releaseIncident")}><RxLapTimer
-                                                size={"18px"}/>
-                                            </button>
-                                            <button className="btn btn-outline-danger py-0 m-0" type="button"
-                                                    id="deploymentIncidentBtn" style={{height: "32px"}}
-                                                    onClick={() => handleRemoveInput("releaseIncident")}>
-                                                <RiDeleteBin5Line size={"18px"}/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row align-items-center">
-                                    <div className="col-4">Olay Yerine Varış:</div>
-                                    <div className="col-8">
-                                        <div className="input-group mb-1">
-                                            <input type="text" className="form-control"
-                                                   aria-describedby="arrivalSceneBtn" id={"arrivalScene"}
-                                                   style={{height: "32px"}} readOnly/>
-                                            <button className="btn btn-outline-success py-0 m-0" type="button"
-                                                    id="arrivalSceneBtn" style={{height: "32px"}}
-                                                    onClick={() => handleButtonClick("arrivalScene")}><RxLapTimer
-                                                size={"18px"}/>
-                                            </button>
-                                            <button className="btn btn-outline-danger py-0 m-0" type="button"
-                                                    id="deploymentIncidentBtn" style={{height: "32px"}}
-                                                    onClick={() => handleRemoveInput("arrivalScene")}>
-                                                <RiDeleteBin5Line size={"18px"}/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row align-items-center">
-                                    <div className="col-4">Vakaya Varış:</div>
-                                    <div className="col-8">
-                                        <div className="input-group mb-1">
-                                            <input type="text" className="form-control"
-                                                   aria-describedby="arrivalIncidentBtn" id={"arrivalIncident"}
-                                                   style={{height: "32px"}} readOnly/>
-                                            <button className="btn btn-outline-success py-0 m-0" type="button"
-                                                    id="arrivalIncidentBtn" style={{height: "32px"}}
-                                                    onClick={() => handleButtonClick("arrivalIncident")}><RxLapTimer
-                                                size={"18px"}/>
-                                            </button>
-                                            <button className="btn btn-outline-danger py-0 m-0" type="button"
-                                                    id="deploymentIncidentBtn" style={{height: "32px"}}
-                                                    onClick={() => handleRemoveInput("arrivalIncident")}>
-                                                <RiDeleteBin5Line size={"18px"}/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row align-items-center">
-                                    <div className="col-4">Olay Yerinden Ayrılış:</div>
-                                    <div className="col-8">
-                                        <div className="input-group mb-1">
-                                            <input type="text" className="form-control"
-                                                   aria-describedby="departureSceneBtn" id={"departureScene"}
-                                                   style={{height: "32px"}} readOnly/>
-                                            <button className="btn btn-outline-success py-0 m-0" type="button"
-                                                    id="departureSceneBtn" style={{height: "32px"}}
-                                                    onClick={() => handleButtonClick("departureScene")}><RxLapTimer
-                                                size={"18px"}/>
-                                            </button>
-                                            <button className="btn btn-outline-danger py-0 m-0" type="button"
-                                                    id="deploymentIncidentBtn" style={{height: "32px"}}
-                                                    onClick={() => handleRemoveInput("departureScene")}>
-                                                <RiDeleteBin5Line size={"18px"}/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row align-items-center">
-                                    <div className="col-4">Hastaneye Varış:</div>
-                                    <div className="col-8">
-                                        <div className="input-group mb-1">
-                                            <input type="text" className="form-control"
-                                                   aria-describedby="arrivalHospitalBtn" id={"arrivalHospital"}
-                                                   style={{height: "32px"}} readOnly/>
-                                            <button className="btn btn-outline-success py-0 m-0" type="button"
-                                                    id="arrivalHospitalBtn" style={{height: "32px"}}
-                                                    onClick={() => handleButtonClick("arrivalHospital")}><RxLapTimer
-                                                size={"18px"}/>
-                                            </button>
-                                            <button className="btn btn-outline-danger py-0 m-0" type="button"
-                                                    id="deploymentIncidentBtn" style={{height: "32px"}}
-                                                    onClick={() => handleRemoveInput("arrivalHospital")}>
-                                                <RiDeleteBin5Line size={"18px"}/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row align-items-center">
-                                    <div className="col-4">Hastaneden Ayrılış:</div>
-                                    <div className="col-8">
-                                        <div className="input-group mb-1">
-                                            <input type="text" className="form-control"
-                                                   aria-describedby="departureHospitalBtn" id={"departureHospital"}
-                                                   style={{height: "32px"}} readOnly/>
-                                            <button className="btn btn-outline-success py-0 m-0" type="button"
-                                                    id="departureHospitalBtn" style={{height: "32px"}}
-                                                    onClick={() => handleButtonClick("departureHospital")}><RxLapTimer
-                                                size={"18px"}/>
-                                            </button>
-                                            <button className="btn btn-outline-danger py-0 m-0" type="button"
-                                                    id="deploymentIncidentBtn" style={{height: "32px"}}
-                                                    onClick={() => handleRemoveInput("departureHospital")}>
-                                                <RiDeleteBin5Line size={"18px"}/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row align-items-center">
-                                    <div className="col-4">İstasyona Varış:</div>
-                                    <div className="col-8">
-                                        <div className="input-group mb-1">
-                                            <input type="text" className="form-control"
-                                                   aria-describedby="arrivalStationBtn" id={"arrivalStation"}
-                                                   style={{height: "32px"}} readOnly/>
-                                            <button className="btn btn-outline-success py-0 m-0" type="button"
-                                                    id="arrivalStationBtn" style={{height: "32px"}}
-                                                    onClick={() => handleButtonClick("arrivalStation")}><RxLapTimer
-                                                size={"18px"}/>
-                                            </button>
-                                            <button className="btn btn-outline-danger py-0 m-0" type="button"
-                                                    id="deploymentIncidentBtn" style={{height: "32px"}}
-                                                    onClick={() => handleRemoveInput("arrivalStation")}>
-                                                <RiDeleteBin5Line size={"18px"}/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
 
-
-                            </div>
+                                    ) :
+                                    (
+                                        <p>Ekip bilgilerini görmek için bir ekip adına tıklayın.</p>
+                                    )
+                            }
                         </div>
                     </div>
                 </div>

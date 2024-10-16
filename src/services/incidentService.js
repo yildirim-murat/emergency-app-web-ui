@@ -49,8 +49,9 @@ export default class IncidentService {
             incidentId: data.id,
             isPriority: data.isPriority,
             calledNumber: data.calledNumber,
+            description:data.description,
             address:{
-                province: data.address.city,
+                province: data.address.province,
                 district: data.address.district,
                 neighborhood: data.address.neighborhood,
                 street:data.address.street,
@@ -58,14 +59,14 @@ export default class IncidentService {
                 longitude:data.address.longitude,
                 description: data.address.description,
             },
-            description:data.description,
-            selectedHeaders:[],
-            selectedSubItems:[]
-
+            incidentDefinition:{
+                definition: data.definition,
+                subDefinition: data.subDefinition,
+            },
         }
 
         const requests = getSelectedDepartmentsFromMask(data.selectedDepartments).map(department => {
-            console.log("Department Name: " + department);
+
             return axios.post(`${baseURL}/api/v1/${department}`, requestData, {
                 headers: {
                     "Authorization": `${getToken()}`,
@@ -76,11 +77,32 @@ export default class IncidentService {
         });
 
         try {
-            const responses = await Promise.all(requests);
-            console.log("Başarıyla birim bilgileri kaydedildi.", responses);
+            await Promise.all(requests);
         } catch (error) {
-            console.log("Birime kaydedilemedi: ", error);
+            console.log("Birime kaydedilemedi: ", error.response ? error.response.data : error);
         }
     }
 
+    async getList(data) {
+       return axios.get(`${baseURL}/api/v1/${data}/get/list`, {
+           headers: {
+               "Authorization": `${getToken()}`,
+               "accept": "*/*",
+               "Content-Type": "application/json",
+           }
+       })
+    }
+
+    async getOneDetailsById(data,id) {
+        return axios.get(`${baseURL}/api/v1/${data}/get/list/by_id`,{
+            headers: {
+                "Authorization": `${getToken()}`,
+                "accept": "*/*",
+                "Content-Type": "application/json",
+            },
+            params:{
+                id:id
+            }
+        })
+    }
 }

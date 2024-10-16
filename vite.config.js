@@ -13,6 +13,7 @@ export default defineConfig(({mode}) => {
     },
     define:{
       __APP_ENV__: JSON.stringify(env.VITE_WEBSOCKET_URL),
+      global: 'window'
     }
   }
 })

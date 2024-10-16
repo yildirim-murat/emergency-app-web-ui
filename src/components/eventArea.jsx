@@ -1,35 +1,83 @@
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {VscNewFile} from 'react-icons/vsc';
-import EventDetails from "./eventDetails.jsx";
-import {Button, Modal} from "react-bootstrap";
 import IncidentService from "../services/incidentService.js";
+import EventDetails from "./eventDetails.jsx";
+import DepartmentChoose from "./department/DepartmentChoose.jsx";
+import PropTypes from "prop-types";
+
+const TabContent = ({tab, idDataRef, removeTab}) => {
+    return (
+        <div
+            className={`tab-pane fade ${tab.isActive ? 'show active' : ''}`}
+            id={tab.id}
+            role="tabpanel"
+            aria-labelledby={`${tab.id}-tab`}
+            tabIndex="0"
+        >
+            {idDataRef?.current != null
+                ? <DepartmentChoose id={idDataRef.current}/>
+                : <EventDetails data={tab.data} removeTab={() => removeTab(tab.id)}/>}
+        </div>
+    );
+};
+
+TabContent.propTypes = {
+    tab: PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        title: PropTypes.string.isRequired,
+        content: PropTypes.string.isRequired,
+        data: PropTypes.any,
+        isActive: PropTypes.bool.isRequired
+    }).isRequired,
+    idDataRef: PropTypes.object.isRequired,
+    removeTab: PropTypes.func.isRequired
+};
 
 function EventArea() {
     const [key, setKey] = useState('home');
     const [tabs, setTabs] = useState([]);
-    const [showModal, setShowModal] = useState(false);
-    const [modalTitle, setModalTitle] = useState("");
+    const [isTabAdded, setIsTabAdded] = useState(false);
+    const dataSet = new IncidentService();
+    const idDataRef = useRef(null);
 
-    const dataSet = new IncidentService()
+    const addNewTab = async (incidentData = null) => {
+        if (!isTabAdded) {
+            try {
+                const response = incidentData ? {data: {data: incidentData}} : await dataSet.create();
+                let newData;
 
-    const addNewTab = async () => {
-        try {
-            const response = await dataSet.create();
-            const newData = response.data.data;
-            const newTabId = newData.id;
-            const newTab = {
-                id: newTabId,
-                title: `Vaka Nu: ${newTabId}`,
-                content: `Vaka ${newTabId} içeriği burada görünecek.`,
-                data: newData
-            };
-            setTabs([...tabs, newTab]);
-            setKey(newTabId);
-        } catch (error) {
-            console.log(error);
+                if (response.status === 201) {
+                    newData = response?.data?.data?.id;
+                    idDataRef.current = null;
+                } else if (response.status === undefined) {
+                    newData = response?.data?.data;
+                }
+
+                const newTabId = newData;
+                const newTab = {
+                    id: newTabId,
+                    title: `Vaka Nu: ${newTabId}`,
+                    content: `Vaka ${newTabId} içeriği burada görünecek.`,
+                    data: {
+                        id: newTabId,
+                        createdAt: new Date().toISOString(),
+                    },
+                    isActive: true
+                };
+                setTabs((prevTabs) => [
+                    ...prevTabs.map(tab => ({...tab, isActive: false})),
+                    newTab
+                ]);
+                setKey(newTabId);
+                setIsTabAdded(true);
+
+            } catch (error) {
+                console.error("Yeni vaka eklenirken hata oluştu: ", error);
+            } finally {
+                localStorage.removeItem("idData");
+            }
         }
     };
-
 
     const removeTab = (tabId) => {
         setTabs(prevTabs => {
@@ -37,45 +85,51 @@ function EventArea() {
 
             if (key === tabId) {
                 setKey(updatedTabs.length > 0 ? updatedTabs[0].id : 'home');
+                setIsTabAdded(false);
             }
 
             return updatedTabs;
         });
     };
 
-    const handleSelectChange = (selectedValue) => {
-        if (selectedValue === "s1") {
-            setModalTitle("Faaliyet Bloğu");
-            setModalContent(
-                "Lorem ipsum dolor sit amet, consectetur adipisci ullamco laboris nisi ut aliquip ex ea commodo consequat... (lorem200)"
-            );
-            setShowModal(true);
-        } else if (selectedValue === "s2") {
-            setModalTitle("Ses Kayıtları");
-            setModalContent("Lorem ipsum dolor sit amet... (lorem10)");
-            setShowModal(true);
-        }
-    };
+    useEffect(() => {
+        const handleStorageChange = (event) => {
+            if (event.key === "idData") {
+                idDataRef.current = event.newValue;
+                const incidentData = JSON.parse(event.newValue);
+                if (!isTabAdded) {
+                    addNewTab(incidentData).then(r => r);
+                }
+            }
+        };
+        window.addEventListener("storage", handleStorageChange);
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, [isTabAdded]);
 
-    const handleClose = () => setShowModal(false);
+    useEffect(() => {
+        if (idDataRef.current) {addNewTab().then(() => setIsTabAdded(true));}
+    }, [idDataRef.current]);
 
     return (
         <div style={{overflowY: "auto", height: "99%"}}>
             <nav>
                 <div className="nav nav-tabs" id="nav-tab" role="tablist">
-                    {tabs.map((tab) => (
-                        <div key={tab.id} className="nav-item d-flex align-items-center mx-1">
+                    {tabs.map((item, index) => (
+                        <div key={index} className="nav-item d-flex align-items-center mx-1">
                             <button
-                                className={`nav-link ${tab.id === key ? 'active' : ''} px-3`}
-                                id={`${tab.id}-tab`}
+                                className={`nav-link ${index === Number(key) ? 'active' : ''} px-3`}
+                                id={`${item.id}-tab`}
                                 data-bs-toggle="tab"
-                                data-bs-target={`#${tab.id}`}
+                                data-bs-target={`#${item.id}`}
                                 type="button"
                                 role="tab"
-                                aria-controls={tab.id}
-                                aria-selected={tab.id === key}
+                                aria-controls={item.id}
+                                aria-selected={item.id === Number(key)}
+                                onClick={() => setKey(index)}
                             >
-                                {tab.title}
+                                {item.title}
                             </button>
                             <button
                                 type="button"
@@ -84,7 +138,7 @@ function EventArea() {
                                 style={{fontSize: "10px", marginLeft: "-18px"}}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    removeTab(tab.id);
+                                    removeTab(item.id);
                                 }}
                             />
                         </div>
@@ -93,46 +147,20 @@ function EventArea() {
                         className="nav-link user-select-none"
                         id="new-tab-btn"
                         type="button"
-                        onClick={() => addNewTab()}
+                        onClick={() => {
+                            setIsTabAdded(false);
+                            addNewTab().then(r => r);
+                        }}
                     >
-                        <VscNewFile size={"24px"}/>Yeni Vaka
+                        <VscNewFile size={"24px"}/> Yeni Vaka
                     </button>
                 </div>
             </nav>
             <div className="tab-content mt-1 px-3" id="nav-tabContent">
                 {tabs.map((tab) => (
-                    <div
-                        key={tab.id}
-                        className={`tab-pane fade ${tab.id === key ? 'show active' : ''}`}
-                        id={tab.id}
-                        role="tabpanel"
-                        aria-labelledby={`${tab.id}-tab`}
-                        tabIndex="0"
-                    >
-                        <EventDetails data={tab.data} removeTab={() => removeTab(tab.id)}/>
-                        {/*<HealthEvent data={tab.data} onSelectChange={handleSelectChange}/>*/}
-                        {/*<PoliceEvent data={tab.data}/>*/}
-                        {/*<GendarmeEvent data={tab.data}/>*/}
-                        {/*<FireDepartmentEvent data={tab.data}/>*/}
-                        {/*<ForestryEvent data={tab.data}/>*/}
-                        {/*<DAEMEvent data={tab.data}/>*/}
-                        {/*<CoastGuardEvent data={tab.data}/>*/}
-                    </div>
+                    <TabContent key={tab.id} tab={tab} idDataRef={idDataRef} removeTab={removeTab}/>
                 ))}
             </div>
-
-            <Modal show={showModal} onHide={handleClose}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{modalTitle}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>Modal Contenttt :)</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Kapat
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-
         </div>
     );
 }

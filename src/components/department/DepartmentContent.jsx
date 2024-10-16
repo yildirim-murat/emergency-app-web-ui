@@ -33,7 +33,7 @@ function DepartmentContent({data, name}) {
 }
 
 DepartmentContent.propTypes = {
-    data: PropTypes.func.isRequired,
+    data: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired
 }
 

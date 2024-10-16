@@ -2,9 +2,7 @@ import Dashboard from "./dashboard.jsx";
 
 function MainPage() {
 
-    return (
-        <><Dashboard/></>
-    );
+    return (<Dashboard/>);
 }
 
 export default MainPage;

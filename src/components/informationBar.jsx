@@ -76,7 +76,7 @@ function InformationBar({setSelectedOption, inCall, setIsConnected}) {
                 </button>
                 <div className="collapse navbar-collapse" id="secondNavbarSupportedContent">
                     <div className="row align-items-center w-100 h-100 user-select-none">
-                        <div className="col-lg-3" style={{visibility: "hidden"}}>
+                        <div className="col-lg-3">
                             <div className="btn-group" role="group"
                                  aria-label="Basic radio toggle button group">
                                 <input type="radio" className="btn-check" name="btnradio" id="btnavaliable"

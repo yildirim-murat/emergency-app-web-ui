@@ -8,7 +8,7 @@ import CallLogs from "../callLogs.jsx";
 import Department from "../department.jsx";
 import DepartmentOperations from "./DepartmentOperations.jsx";
 
-function GendarmeEvent() {
+function GendarmeEvent({data, onSelectChange}) {
     return (
         <div>
             <div className="row text-center align-items-center my-2">
@@ -133,11 +133,11 @@ function GendarmeEvent() {
                     </div>
                 </div>
                 <div className="col-2 h-100 p-0 m-0">
-                    <Address districts={[]}/>
+                    <Address districts={data}/>
                 </div>
                 <div className="col-2 bg-white h-100 p-0 m-0" style={{overflow: "hidden"}}><CallLogs isSmall={true}/>
                 </div>
-                <div className="col-2 user-select-none"><Department isSmall={true}/></div>
+                <div className="col-2 user-select-none"><Department isSmall={true} onSelectionChange={onSelectChange}/></div>
             </div>
             <div className="row overflow-hidden p-0 m-0" style={{height: "38vh"}}>
                 <DepartmentOperations name={"gendarme"}/>

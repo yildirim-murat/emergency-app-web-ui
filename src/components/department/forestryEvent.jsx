@@ -18,7 +18,7 @@ import {GiCircleForest} from "react-icons/gi";
 import {TbRadioactiveFilled} from "react-icons/tb";
 import {useEffect, useState} from "react";
 
-function ForestryEvent() {
+function ForestryEvent({data, onSelectChange}) {
     const [exitKm, setExitKm] = useState(0);
     const [entryKm, setEntryKm] = useState(0);
     const [diffKm, setDiffKm] = useState(0);
@@ -175,7 +175,7 @@ function ForestryEvent() {
                     </div>
                 </div>
                 <div className="col-2 h-100 p-0 m-0">
-                    <Address districts={[]}/>
+                    <Address districts={data}/>
                 </div>
                 <div className="col-2 bg-white h-100 p-0 m-0" style={{overflow: "hidden"}}><CallLogs isSmall={true}/>
                 </div>
@@ -340,7 +340,7 @@ function ForestryEvent() {
                 </div>
             </div>
             <div className="row overflow-hidden p-0 m-0" style={{height: "38vh"}}>
-                <DepartmentOperations name={"forestry"}/>
+                <DepartmentOperations name={"forestry"} />
             </div>
         </div>
     );

@@ -40,14 +40,14 @@ function LoginPage() {
                     setShowToast(true);
                     setToken(response.headers.authorization);
                     dispatch(syncUser(response.data.data));
+                    authService.getData(values.tcknOrEmail, response.headers.authorization)
+                        .then(response => {
+                            localStorage.setItem("user", JSON.stringify(response));
+                        })
                     setTimeout(() => {
                         navigate("/main");
                         setLoading(false)
                     }, 3000);
-
-                    authService.getData(values.tcknOrEmail, response.headers.authorization)
-                        .then(response => {localStorage.setItem("user", JSON.stringify(response));})
-
                 }).catch(error => {
                 let errorMessage;
                 if (error.response && error.response.status === 401) {

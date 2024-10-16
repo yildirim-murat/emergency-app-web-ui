@@ -7,16 +7,40 @@ import Address from "../address.jsx";
 import CallLogs from "../callLogs.jsx";
 import Department from "../department.jsx";
 import DepartmentOperations from "./DepartmentOperations.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import PropTypes from "prop-types";
+import AddressService from "../../services/AddressService.js";
 
 function HealthEvent({data, onSelectChange}) {
+    const [address, setAddress] = useState({})
+    const [trigger, setTrigger] = useState(false);
     const [selectedOption, setSelectedOption] = useState('');
+
     const handleSelectChange = (e) => {
         const value = e.target.value;
         setSelectedOption(value);
         onSelectChange(value);
     };
+
+    const addressService = new AddressService();
+
+    useEffect(() => {
+        handleAddress();
+    }, []);
+
+    const handleAddress = () => {
+        setAddress(data?.data?.data?.address);
+    }
+
+    const handleAddressChange = (updatedAddress) => {
+        setAddress(updatedAddress);
+        console.log("Kontrol amaçlı burdayım. sonra sil beni unutma :) ") // Buradayım. Adresi boş ve dolu vakalarda check ediyoruzz
+    };
+
+    const handleSave = () => {
+        console.log("ID değer: " + JSON.stringify(data?.data.data.id) + " olan forma veriler kaydedilecek");
+        setTrigger(!trigger);
+    }
 
     return (
         <div className={"h-100"}>
@@ -25,15 +49,20 @@ function HealthEvent({data, onSelectChange}) {
                 <div className="col-1 btn-outline-secondary btn mx-1"><MdOutlineCancelPresentation
                     size={"22px"}/> Vazgeç
                 </div>
-                <div className="col-1 btn-outline-primary btn mx-1"><VscFolderActive size={"22px"}/> Etkinleştir</div>
-                <div className="col-1 btn-outline-success btn mx-1"><MdOutlineSave size={"24px"}/> Kaydet</div>
-                <div className="col-1 btn-outline-danger btn mx-1"><GiBrain size={"22px"}/> Hatırla</div>
-                <div className="col-2 btn-outline-primary btn mx-1"><MdOutlineRecycling size={"22px"}/> Mükerrer
-                    Kontrolü
+                <div className="col-1 btn-outline-primary btn mx-1 disabled"><VscFolderActive
+                    size={"22px"}/> Etkinleştir
+                </div>
+                <div className="col-1 btn-outline-success btn mx-1" onClick={handleSave}>
+                    <MdOutlineSave size={"24px"}/>
+                    Kaydet
+                </div>
+                <div className="col-1 btn-outline-danger btn mx-1 disabled"><GiBrain size={"22px"}/> Hatırla</div>
+                <div className="col-2 btn-outline-primary btn mx-1 disabled"><MdOutlineRecycling
+                    size={"22px"}/> Mükerrer Kontrolü
                 </div>
                 <div className="col-4 mx-1">
                     <select className="form-select" value={selectedOption} onChange={handleSelectChange}>
-                        <option value={""} selected>Seçiniz</option>
+                        <option value={""}>Seçiniz</option>
                         <option value="s1">Faaliyet Bloğu</option>
                         <option value="s2">Ses Kayıtları</option>
                     </select>
@@ -41,15 +70,23 @@ function HealthEvent({data, onSelectChange}) {
             </div>
             <div className="row bg-primary-subtle" style={{height: "40vh"}}>
                 <div className="col-3 h-100 user-select-none">
-                    <div className="row text-center" style={{border: "1px solid #000000", borderRadius: "8px"}}>
-                        <div className="col" style={{borderRight: "1px solid #000000"}}>Vaka Nu</div>
-                        <div className="col">Tarih</div>
+                    <div className="row text-center align-items-center"
+                         style={{border: "1px solid #000000", borderRadius: "8px"}}>
+                        <div className="col" style={{borderRight: "1px solid #000000"}}>
+                            Vaka Nu : <span className={"nu-format"}> {data?.data?.data?.incidentId} </span>
+                        </div>
+                        <div className="col">Tarih :
+                            <span className={" nu-format"} style={{fontSize: "11px"}}>
+                                 {addressService.formatTime(data?.data?.data?.createdAt)} {addressService.formatDigitalDate(data?.data?.data?.createdAt)}
+                            </span>
+                        </div>
                     </div>
                     <div className="row">
                         <div className="row ms-1">Kurum Görevlendirme Zamanı:</div>
                         <div className="row">
                             <div className="input-group my-2">
-                                <input type="text" className="form-control" placeholder="01.01.2025 12:34:56"
+                                <input type="text" className="form-control"
+                                       placeholder={`${addressService.formatTime(data?.data?.data?.createdAt)} ${addressService.formatDigitalDate(data?.data?.data?.createdAt)}`}
                                        aria-label="date time" aria-describedby="button-addon2" disabled={true}/>
                                 <button className="btn btn-outline-secondary" type="button" id="button-addon2"
                                         disabled={true}><RiMapPinTimeLine size={"20px"}/>
@@ -86,14 +123,26 @@ function HealthEvent({data, onSelectChange}) {
                         <div className="row ms-2">Olay Türü</div>
                         <div className="row">
                             <div className="input-group mb-3">
-                                <input type="text" className="form-control" placeholder="Arama..." aria-label="Username"
-                                       aria-describedby="basic-addon1"/>
+                                <input type="text" className="form-control" placeholder="Arama..." aria-label="search"
+                                       aria-describedby="basic-addon1" disabled={true}/>
                             </div>
                         </div>
                         <div className="row">
-                            <div className="mb-3">
-                                <textarea className="form-control" id="exampleFormControlTextarea1" rows="3"
-                                          style={{maxHeight: "150px"}} readOnly={true}></textarea>
+                            <div className="mb-3 overflow-hidden" style={{maxHeight: "150px"}}>
+                                {data?.data?.data?.incidentDefinition?.definition?.split(',').map((line, index) => {
+                                    const trimmedLine = line.trim();
+                                    return (
+                                        <div key={index}>
+                                            <b>{trimmedLine}</b>
+                                            {data?.data?.data?.incidentDefinition?.subDefinition?.includes(trimmedLine) && (
+                                                <div style={{marginLeft: "20px"}}>
+                                                    ==&gt; {data?.data?.data?.incidentDefinition?.subDefinition.split(':')[1].trim()}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                                <br/>
                             </div>
                         </div>
                     </div>
@@ -103,8 +152,8 @@ function HealthEvent({data, onSelectChange}) {
                         Olay Tanımı
                         <div className="row">
                             <div className="mb-3">
-                                <textarea className="form-control" id="exampleFormControlTextarea1"
-                                          style={{maxHeight: "55px", overflowY: "auto"}}></textarea>
+                                <input className="form-control" id="definitionInput"
+                                       placeholder={data?.data?.data?.description} readOnly={true}/>
                             </div>
                         </div>
                     </div>
@@ -130,16 +179,19 @@ function HealthEvent({data, onSelectChange}) {
                         Diğer Kurum Açıklamaları
                         <div className="row">
                             <div className="mb-3">
-                                <textarea className="form-control" id="exampleFormControlTextarea1" readOnly={true}
-                                          style={{maxHeight: "55px", overflowY: "auto"}}></textarea>
+                                <textarea className="form-control" id="desc-other-department" readOnly={true}
+                                          style={{maxHeight: "55px", overflowY: "auto"}}
+                                          placeholder={data?.data?.data?.description}></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="col-2 h-100 p-0 m-0">
-                    <Address districts={[]}/>
+                    <Address data={address} triggerUpdate={trigger} onAddressChange={handleAddressChange}/>
                 </div>
-                <div className="col-2 bg-white h-100 p-0 m-0" style={{overflow: "hidden"}}><CallLogs isSmall={true}/>
+                <div className="col-2 bg-white h-100 p-0 m-0 user-select-none"
+                     style={{overflow: "hidden"}}>
+                    <CallLogs isSmall={true}/>
                 </div>
                 <div className="col-2 user-select-none">
                     <Department
@@ -149,14 +201,33 @@ function HealthEvent({data, onSelectChange}) {
                 </div>
             </div>
             <div className="row overflow-hidden p-0 m-0" style={{height: "38vh"}}>
-                <DepartmentOperations name={"health"} />
+                <DepartmentOperations name={"health"}/>
             </div>
         </div>
     );
 }
 
-HealthEvent.prototypes= {
-    data: PropTypes.array,
+HealthEvent.propTypes = {
+    data: PropTypes.shape({
+        data: PropTypes.shape({
+            data: PropTypes.shape({
+                id: PropTypes.number,
+                createdAt: PropTypes.string,
+                incidentId: PropTypes.number,
+                address: PropTypes.object,
+                description: PropTypes.string,
+                incidentDefinition: PropTypes.shape({
+                    definition: PropTypes.string,
+                    subDefinition: PropTypes.string
+                }),
+            }),
+            address: PropTypes.object,
+            incidentId: PropTypes.string,
+            createdAt: PropTypes.string,
+            incidentDefinition: PropTypes.object,
+            description: PropTypes.string
+        })
+    }),
     onSelectChange: PropTypes.func
 }
 

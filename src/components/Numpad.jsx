@@ -74,6 +74,7 @@ function Numpad({callNu, inCall, onCall, acceptData, voice}) {
             <div className="row">
                 <div className="input-group">
                     <input
+                        id={"input-numpad"}
                         type="text"
                         className="form-control text-end nu-format"
                         placeholder="0"

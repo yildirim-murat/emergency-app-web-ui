@@ -7,8 +7,10 @@ import {RiMapPinTimeLine} from "react-icons/ri";
 import Address from "../address.jsx";
 import CallLogs from "../callLogs.jsx";
 import Department from "../department.jsx";
+import PropTypes from "prop-types";
 
-function PoliceEvent() {
+function PoliceEvent({data, onSelectChange}) {
+
     return (
         <div>
             <div className="row text-center align-items-center my-2">
@@ -162,17 +164,22 @@ function PoliceEvent() {
                     </div>
                 </div>
                 <div className="col-2 h-100 p-0 m-0">
-                    <Address districts={[]}/>
+                    <Address districts={[]} triggerUpdate={true} province={"ANKARA"} addressData={data}/>
                 </div>
                 <div className="col-2 bg-white h-100 p-0 m-0" style={{overflow: "hidden"}}><CallLogs isSmall={true}/>
                 </div>
-                <div className="col-2 user-select-none"><Department isSmall={true}/></div>
+                <div className="col-2 user-select-none"><Department isSmall={true} onSelectionChange={onSelectChange}/></div>
             </div>
             <div className="row overflow-hidden p-0 m-0" style={{height: "38vh"}}>
                 <DepartmentOperations name={"police"}/>
             </div>
         </div>
     );
+}
+
+PoliceEvent.prototypes = {
+    data:PropTypes.array.isRequired,
+    onSelectChange:PropTypes.func
 }
 
 export default PoliceEvent;

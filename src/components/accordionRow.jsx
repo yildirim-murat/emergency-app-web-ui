@@ -3,22 +3,13 @@ import PropTypes from "prop-types";
 function AccordionRow({
                           index,
                           content,
-                          incidentsList,
+                          subDefinitions,
                           onHeaderSelect,
                           onSubItemSelect,
                           selectedHeaders,
                           selectedSubItems
                       }) {
     const id = `${index + 1}`;
-
-    const getValue = (key) => {
-        return incidentsList
-            .filter(item => item[key] !== undefined)
-            .map(item => item[key]);
-    };
-
-    const values = getValue(content);
-    const hasMultipleValues = values.length > 1;
 
     const isHeaderSelected = selectedHeaders.includes(content);
 
@@ -37,12 +28,12 @@ function AccordionRow({
             <div className="accordion-item">
                 <h2 className="accordion-header">
                     <button
-                        className={`accordion-button ${!hasMultipleValues ? 'no-icon' : 'collapsed'}`}
+                        className={`accordion-button ${subDefinitions.length === 0 ? 'no-icon' : 'collapsed'}`}
                         type="button"
-                        data-bs-toggle={hasMultipleValues ? 'collapse' : ''}
-                        data-bs-target={hasMultipleValues ? `#${id}` : ''}
+                        data-bs-toggle={subDefinitions.length > 0 ? 'collapse' : ''}
+                        data-bs-target={subDefinitions.length > 0 ? `#${id}` : ''}
                         aria-expanded="false"
-                        aria-controls={hasMultipleValues ? id : ''}
+                        aria-controls={subDefinitions.length > 0 ? id : ''}
                         style={{
                             backgroundColor: "#CFE2FF",
                             boxShadow: "none",
@@ -62,7 +53,7 @@ function AccordionRow({
                         </div>
                     </button>
                 </h2>
-                {hasMultipleValues && (
+                {subDefinitions.length > 0 && (
                     <div
                         id={id}
                         className="accordion-collapse collapse"
@@ -70,17 +61,17 @@ function AccordionRow({
                     >
                         <div className="accordion-body">
                             <div className="form-check">
-                                {values.map((value, key) => (
+                                {subDefinitions.map((subItem, key) => (
                                     <div key={key}>
                                         <input
                                             className="form-check-input"
                                             type="checkbox"
-                                            checked={selectedSubItems.includes(value)}
-                                            onChange={(e) => handleSubItemChange(value, e)}
+                                            checked={selectedSubItems.includes(subItem)}
+                                            onChange={(e) => handleSubItemChange(subItem, e)}
                                             id={`valueCheck-${id}-${key}`}
                                         />
                                         <label className="form-check-label" htmlFor={`valueCheck-${id}-${key}`}>
-                                            {value}
+                                            {subItem}
                                         </label>
                                     </div>
                                 ))}
@@ -94,9 +85,9 @@ function AccordionRow({
 }
 
 AccordionRow.propTypes = {
-    index: PropTypes.number,
-    content: PropTypes.string,
-    incidentsList: PropTypes.array.isRequired,
+    index: PropTypes.number.isRequired,
+    content: PropTypes.string.isRequired,
+    subDefinitions: PropTypes.array.isRequired,
     onHeaderSelect: PropTypes.func.isRequired,
     onSubItemSelect: PropTypes.func.isRequired,
     selectedHeaders: PropTypes.array.isRequired,
