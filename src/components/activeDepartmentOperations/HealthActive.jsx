@@ -190,7 +190,7 @@ const CrewDetails = ({selectedCrewDetails, onSaveTime}) => {
         });
         onSaveTime(data);
     };
-//Bu class içindeyim. Zamanları main componente gönderip kaydedelim. Ayrıca mainComponet(HealthEvent) update işlemleri de yapılacak. 16:30 17.10.2024
+//Bu class içindeyim. Zamanları main componente gönderip kaydedelim. Ayrıca mainComponet(HealthEvent) update işlemleri de yapılacak. 16:30 17.10.2024***
     return (
         <div className="col-5 align-items-center overflow-y-auto" style={{fontSize: "12px", height: "90%"}}>
             <div>Ekip Kayıt Bilgileri</div>
