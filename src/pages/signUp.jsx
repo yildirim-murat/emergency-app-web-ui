@@ -23,16 +23,38 @@ function SignUp() {
         fetchData();
     }, []);
 
+    function formatPhoneNumber(value) {
+        const cleaned = value.replace(/\D/g, '');
+
+        if (cleaned.length === 10) {
+            return `+90-${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 8)}-${cleaned.slice(8, 10)}`;
+        }
+
+        if (cleaned.length === 11 && cleaned.startsWith('0')) {
+            return `+90-${cleaned.slice(1, 4)}-${cleaned.slice(4, 7)}-${cleaned.slice(7, 9)}-${cleaned.slice(9, 11)}`;
+        }
+
+        return value;
+    }
+
     const navigate = useNavigate();
     const [toastMessage, setToastMessage] = useState({});
     const [showToast, setShowToast] = useState(false);
     const [loading, setLoading] = useState(false);
-
     const authService = new StaffService();
-
     const navigateLogin = () => {
         navigate("/login");
     };
+
+    useEffect(() => {
+        if (showToast) {
+            const timer = setTimeout(() => {
+                setShowToast(false);
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [showToast]);
 
     const formik = useFormik({
         initialValues: {
@@ -88,15 +110,12 @@ function SignUp() {
         }
     });
 
-    useEffect(() => {
-        if (showToast) {
-            const timer = setTimeout(() => {
-                setShowToast(false);
-            }, 3000);
+    const handlePhoneNumberChange = (e) => {
+        const inputValue = e.target.value;
+        const formattedPhoneNumber = formatPhoneNumber(inputValue);
+        formik.setFieldValue('phoneNumber', formattedPhoneNumber);
+    };
 
-            return () => clearTimeout(timer);
-        }
-    }, [showToast]);
 
     return (
         <div className={"d-flex justify-content-center align-items-center w-100 h-100 user-select-none overflow-hidden"}
@@ -159,7 +178,7 @@ function SignUp() {
                         className={`form-control ${formik.touched.phoneNumber && formik.errors.phoneNumber ? 'is-invalid' : ''}`}
                         placeholder="Telefon Numaranız"
                         value={formik.values.phoneNumber}
-                        onChange={formik.handleChange}
+                        onChange={handlePhoneNumberChange}
                         onBlur={formik.handleBlur}
                     />
                     {formik.touched.phoneNumber && formik.errors.phoneNumber ? (

@@ -7,6 +7,7 @@ import Priority from "./priority.jsx";
 import Department from "./department.jsx";
 import IncidentService from "../services/incidentService.js";
 import AddressService from "../services/AddressService.js";
+import {getExactPropWrapperFunctions} from "eslint-plugin-react/lib/util/propWrapper.js";
 
 function EventDetails({data, removeTab}) {
     const [message, setMessage] = useState({title: "", content: ""});
@@ -17,7 +18,7 @@ function EventDetails({data, removeTab}) {
     const [incidentsList, setIncidentsList] = useState([]);
     const [keyList, setKeyList] = useState([])
     const [searchTerm, setSearchTerm] = useState('');
-    const [triggerUpdate, setTriggerUpdate] = useState(false);
+    const [triggerUpdate, setTriggerUpdate] = useState(0);
     const [selectedHeaders, setSelectedHeaders] = useState([]);
     const [selectedSubItems, setSelectedSubItems] = useState({});
     const [selectedDepartments, setSelectedDepartments] = useState(0);
@@ -91,8 +92,6 @@ function EventDetails({data, removeTab}) {
     useEffect(() => {
 
         const definitionSubDefinitionMap = {};
-
-        // console.log("IncidentList " + JSON.stringify(incidentsList))
         incidentsList.forEach(item => {
             if (item.definition) {
                 if (!definitionSubDefinitionMap[item.definition]) {
@@ -168,8 +167,7 @@ function EventDetails({data, removeTab}) {
                 selectedDepartments: selectedDepartments,
             }
             try {
-                service.savedForm(sendData).then(() => console.log("Veriler Başarılı Şekilde Gönderildi."));
-                removeTab();
+                service.savedForm(sendData).then(() => removeTab()).catch((error) => console.error("Veriler Kaydedilirken Hata Oluştu. Hata: " + error));
             } catch (error) {
                 setMessage({title: "Hata", content: `Veriler Kaydedilirken Hata Oluştu. Hata: ${error}`});
                 setShowModal(true)

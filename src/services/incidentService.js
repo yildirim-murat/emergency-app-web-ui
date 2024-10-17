@@ -49,22 +49,21 @@ export default class IncidentService {
             incidentId: data.id,
             isPriority: data.isPriority,
             calledNumber: data.calledNumber,
-            description:data.description,
-            address:{
+            description: data.description,
+            address: {
                 province: data.address.province,
                 district: data.address.district,
                 neighborhood: data.address.neighborhood,
-                street:data.address.street,
+                street: data.address.street,
                 latitude: data.address.latitude,
-                longitude:data.address.longitude,
+                longitude: data.address.longitude,
                 description: data.address.description,
             },
-            incidentDefinition:{
+            incidentDefinition: {
                 definition: data.definition,
                 subDefinition: data.subDefinition,
             },
         }
-
         const requests = getSelectedDepartmentsFromMask(data.selectedDepartments).map(department => {
 
             return axios.post(`${baseURL}/api/v1/${department}`, requestData, {
@@ -79,29 +78,29 @@ export default class IncidentService {
         try {
             await Promise.all(requests);
         } catch (error) {
-            console.log("Birime kaydedilemedi: ", error.response ? error.response.data : error);
+            console.error("Birime kaydedilemedi: ", error.response ? error.response.data : error);
         }
     }
 
     async getList(data) {
-       return axios.get(`${baseURL}/api/v1/${data}/get/list`, {
-           headers: {
-               "Authorization": `${getToken()}`,
-               "accept": "*/*",
-               "Content-Type": "application/json",
-           }
-       })
+        return axios.get(`${baseURL}/api/v1/${data}/get/list`, {
+            headers: {
+                "Authorization": `${getToken()}`,
+                "accept": "*/*",
+                "Content-Type": "application/json",
+            }
+        })
     }
 
-    async getOneDetailsById(data,id) {
-        return axios.get(`${baseURL}/api/v1/${data}/get/list/by_id`,{
+    async getOneDetailsById(data, id) {
+        return axios.get(`${baseURL}/api/v1/${data}/get/list/by_id`, {
             headers: {
                 "Authorization": `${getToken()}`,
                 "accept": "*/*",
                 "Content-Type": "application/json",
             },
-            params:{
-                id:id
+            params: {
+                id: id
             }
         })
     }

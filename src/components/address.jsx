@@ -7,7 +7,6 @@ function Address({triggerUpdate, data, onAddressChange}) {
 
     const [district, setDistrict] = useState([]);
     const [neighborhoods, setNeighborhoods] = useState([]);
-    const [inputValue, setInputValue] = useState("");
 
     const [selectedProvince, setSelectedProvince] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
@@ -17,52 +16,48 @@ function Address({triggerUpdate, data, onAddressChange}) {
     const [selectedLongitude, setSelectedLongitude] = useState("");
     const [selectedAddressDesc, setSelectedAddressDesc] = useState("");
 
-
     useEffect(() => {
-        const getProvince = JSON.parse(localStorage.getItem("user")).data.data.province || "ANKARA"
-        if (data === undefined || data.province === null) {
-            getAddress(getProvince).then(r => {
-                setDistrict(r.data)
-                setSelectedProvince(r.data)
-            }).catch((error) => console.error("Address fetching error:", error))
-        } else if (data) {
-            if (data.province !== undefined && data.province !== "") {
-                setSelectedProvince(data.province)
-            } else {
-                setSelectedProvince(getProvince)
+        if (data) {
+            if (data.province && data.province !== selectedProvince) {
+                setSelectedProvince(data.province);
             }
-            setSelectedDistrict(data.district);
-            setSelectedNeighborhoods(data.neighborhood);
-            setSelectedStreet(data.street);
-            setSelectedLatitude(data.latitude);
-            setSelectedLongitude(data.longitude);
-            setSelectedAddressDesc(data.description);
-        }
-    }, [data]);
-
-    useEffect(() => {
-        let getProvince;
-        if (selectedDistrict !== "") {
-            if (!data || data.province === null) {
-                getProvince = JSON.parse(localStorage.getItem("user")).data.data.province
-            } else if (data) {
-                getProvince = data.province
+            if (data.district && data.district !== selectedDistrict) {
+                setSelectedDistrict(data.district);
             }
-            getStreet(getProvince, selectedDistrict).then((response) => {
-                // setNeighborhoods(response);
-                console.log("Success district data fetched" + JSON.stringify(response));
-            }).catch((error) => {
-                console.error("Provincial and district data received but error encountered: " + error + " -->> " + JSON.stringify(data))
-            });
+            if (data.neighborhood && data.neighborhood !== selectedNeighborhoods) {
+                setSelectedNeighborhoods(data.neighborhood);
+            }
+            if (data.street && data.street !== selectedStreet) {
+                setSelectedStreet(data.street);
+            }
+            if (data.latitude && data.latitude !== selectedLatitude) {
+                setSelectedLatitude(data.latitude);
+            }
+            if (data.longitude && data.longitude !== selectedLongitude) {
+                setSelectedLongitude(data.longitude);
+            }
+            if (data.description && data.description !== selectedAddressDesc) {
+                setSelectedAddressDesc(data.description);
+            }
         } else {
-            console.log("Province and district not found")
-        }
-    }, [selectedDistrict, data]);
+            const userProvinceDefaultValue = JSON.parse(localStorage.getItem("user"));
+            const province = userProvinceDefaultValue?.data?.data?.province || "ANKARA";
 
+            if (province && province !== selectedProvince) {
+                getAddress(province).then((response) => setDistrict(response));
+                setSelectedProvince(province);
+            }
+        }
+    }, [data, selectedProvince, selectedDistrict, selectedNeighborhoods, selectedStreet, selectedAddressDesc, selectedLatitude, selectedLongitude]);
+
+
+    useEffect(() => {
+        getStreet(selectedProvince, selectedDistrict).then((response) => setNeighborhoods(response))
+    }, [selectedDistrict, selectedProvince])
 
     useEffect(() => {
         updateAddress()
-    }, [triggerUpdate]);
+    }, [triggerUpdate, selectedProvince, selectedDistrict, selectedNeighborhoods, selectedStreet, selectedLatitude, selectedLongitude, selectedAddressDesc]);
 
     function updateAddressCharCount() {
         const textAreaAddress = document.getElementById('addressDescription');
@@ -76,8 +71,7 @@ function Address({triggerUpdate, data, onAddressChange}) {
     }
 
     async function getStreet(province, district) {
-        const response = await AddressService.getAddress.getNeighborhoods(province, district);
-        return response.data;
+        return await AddressService.getAddress.getNeighborhoods(province, district);
     }
 
     const handleDistrictChange = (e) => {
@@ -129,7 +123,7 @@ function Address({triggerUpdate, data, onAddressChange}) {
                     list="poiList"
                     placeholder="Adres veya POI Arama"
                     disabled={true}
-                    value={"inputValue"}
+                    value={""}
                 />
                 <datalist id="poiList"></datalist>
             </div>
@@ -138,11 +132,11 @@ function Address({triggerUpdate, data, onAddressChange}) {
                     className="form-control"
                     list="datalistDistricts"
                     placeholder="İlçe Giriniz..."
-                    value={"selectedDistrict"}
+                    value={selectedDistrict || ''}
                     onChange={handleDistrictChange}
                 />
                 <datalist id="datalistDistricts">
-                    {district && district.length > 0 && district.map((item, index) => (
+                    {district && district.data && district.data.map((item, index) => (
                         <option key={index} value={item}/>
                     ))}
                 </datalist>
@@ -153,10 +147,10 @@ function Address({triggerUpdate, data, onAddressChange}) {
                     list="datalistNeighborhood"
                     placeholder="Mahalle Giriniz..."
                     onChange={handleNeighborhoodChange}
-                    value={"selectedNeighborhoods"}
+                    value={selectedNeighborhoods || ''}
                 />
                 <datalist id="datalistNeighborhood">
-                    {neighborhoods && neighborhoods.length > 0 && neighborhoods.map((item, index) => (
+                    {neighborhoods && neighborhoods.data && neighborhoods.data.map((item, index) => (
                         <option key={index} value={item}/>
                     ))}
                 </datalist>
@@ -167,7 +161,7 @@ function Address({triggerUpdate, data, onAddressChange}) {
                     list="datalistStreet"
                     placeholder="Cadde/Sokak Giriniz..."
                     onChange={handleStreetChange}
-                    value={"selectedStreet"}
+                    value={selectedStreet || ""}
                 />
                 <datalist id="datalistStreet"></datalist>
             </div>
@@ -177,7 +171,7 @@ function Address({triggerUpdate, data, onAddressChange}) {
                         className="form-control"
                         placeholder="Enlem"
                         onChange={handleLatitudeChange}
-                        value={"selectedLatitude"}
+                        value={selectedLatitude || ""}
                     />
                 </div>
                 <div className="col-6 w-50 p-0 m-0">
@@ -185,7 +179,7 @@ function Address({triggerUpdate, data, onAddressChange}) {
                         className="form-control"
                         placeholder="Boylam"
                         onChange={handleLongitudeChange}
-                        value={"selectedLongitude"}
+                        value={selectedLongitude || ""}
                     />
                 </div>
             </div>
@@ -198,7 +192,7 @@ function Address({triggerUpdate, data, onAddressChange}) {
                     style={{resize: "none"}}
                     maxLength={1024}
                     onChange={handleAddressDescChange}
-                    value={"selectedAddressDesc"}
+                    value={selectedAddressDesc || ""}
                 />
                 <span className={"w-100 text-end mb-2"} style={{fontSize: "10px"}}>{addressCharCount + "/1024"}</span>
             </div>
@@ -207,7 +201,7 @@ function Address({triggerUpdate, data, onAddressChange}) {
 }
 
 Address.propTypes = {
-    triggerUpdate: PropTypes.bool,
+    triggerUpdate: PropTypes.number,
     data: PropTypes.object,
     onAddressChange: PropTypes.func
 };
