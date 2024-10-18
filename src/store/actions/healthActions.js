@@ -1,14 +1,8 @@
 export const UPDATE = "UPDATE";
 
-export function update(){
-    return {
-        type: UPDATE
-    }
-}
-
-export function syncHealth(health){
+export function syncHealth(eventData, crew){
     return {
         type: UPDATE,
-        payload: health
-    }
+        payload: {eventData, crew},
+    };
 }

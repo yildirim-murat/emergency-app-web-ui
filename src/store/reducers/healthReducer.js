@@ -12,7 +12,8 @@ export default function healthReducer(state = initialState, {type, payload}) {
                 ...state,
                 healthProps: {
                     ...state.healthProps,
-                    health: {...state.healthProps.health,...payload}
+                    eventData: payload.eventData || state.healthProps.eventData,
+                    crew: payload.crew || state.healthProps.crew,
                 }
             }
         default:

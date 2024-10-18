@@ -145,7 +145,6 @@ const InputGroup = ({id, handleButtonClick, handleRemoveInput}) => {
         </div>
     );
 };
-
 InputGroup.propTypes = {
     id: PropTypes.string.isRequired,
     handleButtonClick: PropTypes.func.isRequired,
@@ -163,14 +162,15 @@ const inputFields = [
     {label: "İstasyona Varış", id: "arrivalStation"},
 ];
 
-const CrewDetails = ({selectedCrewDetails, onSaveTime}) => {
+const CrewDetails = ({selectedCrewDetails}) => {
+    const dispatch = useDispatch();
+
     const handleButtonClick = (id, formattedTime) => {
         const inputElement = document.getElementById(id);
         if (inputElement) {
             inputElement.value = formattedTime;
         }
     };
-
     const handleRemoveInput = (id) => {
         const inputElement = document.getElementById(id);
         if (inputElement) {
@@ -179,18 +179,19 @@ const CrewDetails = ({selectedCrewDetails, onSaveTime}) => {
     };
 
     const handleSaveTimeClick = () => {
-        const data = {
+        const crewData = {
             name: selectedCrewDetails.name,
             times: {}
         };
-
         inputFields.forEach(({id}) => {
             const inputElement = document.getElementById(id);
             if (inputElement) {
-                data.times[id] = inputElement.value;
+                crewData.times[id] = inputElement.value;
             }
         });
-        onSaveTime(data);
+
+        //ekip adı ve bilgilerini array olarak kaydedeceğiz. BURADAYIM...
+        dispatch(syncHealth(crewData));
     };
 
     return (
@@ -204,7 +205,7 @@ const CrewDetails = ({selectedCrewDetails, onSaveTime}) => {
                         <div className="col-5">
                             <button className="btn btn-outline-danger px-2 m-0 w-100" type="button" id="saveTime"
                                     style={{height: "32px", fontSize: "13px"}} onClick={handleSaveTimeClick}>
-                                <IoIosSave size={"24px"} /> Zamanları Kaydet
+                                <IoIosSave size={"24px"}/> Zamanları Kaydet
                             </button>
                         </div>
                     </div>
@@ -225,12 +226,12 @@ const CrewDetails = ({selectedCrewDetails, onSaveTime}) => {
                     </div>
                 </div>
             ) : (
-                <p>Ekip bilgilerini görmek için bir ekip adına tıklayın.</p>
+                <p style={{fontSize: "20px", fontStyle: "italic"}}>Ekip bilgilerini görmek için bir ekip adına
+                    tıklayın...</p>
             )}
         </div>
     );
 }
-
 CrewDetails.propTypes = {
     selectedCrewDetails: PropTypes.shape({
         name: PropTypes.string
@@ -251,13 +252,7 @@ function HealthActive() {
     const [selectedCrew, setSelectedCrew] = useState(null);
     const [selectedCrewDetails, setSelectedCrewDetails] = useState({});
     const [sentData, setSentData] = useState({});
-    const dispatch = useDispatch();
-    const [crewData, setCrewData] = useState({
-        id: '',
-        crewTime: '',
-        crewStatus: '',
-        address: data?.address || {}
-    })
+
     useEffect(() => {
         const difference = Math.max(0, entryKm - exitKm);
         setDiffKm(difference);
@@ -275,7 +270,6 @@ function HealthActive() {
         if (crewName.trim() && !crewList.includes(crewName.trim())) {
             setCrewList(prev => [...prev, crewName.trim()]);
             setCrewName('');
-            dispatch((syncHealth(crewData)))
         }
     };
     const handleCrewClick = (crewName) => {
@@ -296,11 +290,6 @@ function HealthActive() {
         setIsEditing(null);
     };
 
-    const handleSaveOperations = (data) => {
-        setSentData(data);
-        console.log("Kaydedilmeye Hazır Data: " + JSON.stringify(data,null,2))
-    }
-
     return (<div className="d-flex align-items-start w-100 h-100 overflow-hidden">
         <div className="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
             <button className="nav-link active" id="v-pills-base-tab" data-bs-toggle="pill"
@@ -316,7 +305,7 @@ function HealthActive() {
                     aria-selected="false">Hastane İşlemleri
             </button>
         </div>
-        <div className="tab-content h-100" style={{width: "200vh"}} id="v-pills-tabContent">
+        <div className="tab-content h-100" style={{width: "200vw"}} id="v-pills-tabContent">
             <div className="tab-pane fade show active w-100 h-100" id="v-pills-base" role="tabpanel"
                  aria-labelledby="v-pills-base-tab" tabIndex="0">
                 <div className="row w-100 h-100">
@@ -333,13 +322,11 @@ function HealthActive() {
                     />
                     {selectedCrewDetails &&
                         <CrewDetails
-                        selectedCrewDetails={selectedCrewDetails}
-                        handleButtonClick={handleButtonClick}
-                        handleRemoveInput={handleRemoveInput}
-                        onSaveTime={handleSaveOperations}
-                    />
+                            selectedCrewDetails={selectedCrewDetails}
+                            handleButtonClick={handleButtonClick}
+                            handleRemoveInput={handleRemoveInput}
+                        />
                     }
-
 
 
                     {/*<div className="col-3">*/}

@@ -1,52 +1,54 @@
-import { FaEdit } from "react-icons/fa";
-import { MdOutlineCancelPresentation, MdOutlineRecycling, MdOutlineSave } from "react-icons/md";
-import { GiBrain } from "react-icons/gi";
-import { VscFolderActive } from "react-icons/vsc";
-import { RiMapPinTimeLine } from "react-icons/ri";
+import {FaEdit} from "react-icons/fa";
+import {MdOutlineCancelPresentation, MdOutlineRecycling, MdOutlineSave} from "react-icons/md";
+import {GiBrain} from "react-icons/gi";
+import {VscFolderActive} from "react-icons/vsc";
+import {RiMapPinTimeLine} from "react-icons/ri";
 import Address from "../address.jsx";
 import CallLogs from "../callLogs.jsx";
 import Department from "../department.jsx";
 import DepartmentOperations from "./DepartmentOperations.jsx";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import AddressService from "../../services/AddressService.js";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {syncHealth} from "../../store/actions/healthActions.js";
 
-function HealthEvent({ data, onSelectChange }) {
+function HealthEvent({data, onSelectChange}) {
     const [address, setAddress] = useState({});
     const [trigger, setTrigger] = useState(0);
     const [selectedOption, setSelectedOption] = useState('');
-    const [isPriority, setIsPriority] = useState(false);
-    const [selectedRegion, setSelectedRegion] = useState('');
-    const [definition, setDefinition] = useState(data?.data?.data?.description || '');
-    const [callerName, setCallerName] = useState('');
-    const [healthDescription, setHealthDescription] = useState('');
     const addressService = new AddressService();
-    const dispatch = useDispatch();
+    const dispatch= useDispatch();
     const [healthData, setHealthData] = useState({
         id: data?.data?.data?.id || '',
         incidentId: data?.data?.data?.incidentId || '',
         isPriority: data?.data?.data?.isPriority || false,
+        calledNumber: data?.data?.data?.calledNumber || "",
         selectedRegion: '',
-        definition: data?.data?.data?.description || '',
         callerName: '',
         healthDescription: '',
-        address: data?.data?.data?.address || {}
+        address: data?.data?.data?.address || {},
+        description: data?.data?.data?.description || "",
+        incidentDefinition: data?.data?.data?.incidentDefinition || {},
     });
+
 
     useEffect(() => {
         handleAddress();
     }, []);
 
     useEffect(() => {
-        setIsPriority(data?.data?.data?.isPriority || false);
+        setHealthData(prevData => ({
+            ...prevData,
+            isPriority: data?.data?.data?.isPriority || false
+        }));
     }, [data]);
 
     const handleSelectChange = (e) => {
         const value = e.target.value;
         setSelectedOption(value);
         onSelectChange(value);
+        setHealthData(prevData => ({...prevData, selectedRegion: value}));
     };
 
     const handleAddress = () => {
@@ -54,33 +56,39 @@ function HealthEvent({ data, onSelectChange }) {
     };
 
     const handleAddressChange = (updatedAddress) => {
-        setHealthData({...healthData, address: updatedAddress});
+        setHealthData(prevData => ({...prevData, address: updatedAddress}));
     };
 
     const handleSave = () => {
-        dispatch(syncHealth(healthData))
-        setTrigger(prevState => prevState + 1);
+        console.log("Gelen Data: " + JSON.stringify(data?.data?.data, null, 2));
+        console.log("***")
+        console.log("Kaydedilcek Veri: " + JSON.stringify(healthData, null, 2));
+        //dispatch(syncHealth(healthData));
+        // setTrigger(prevState => prevState + 1);
     };
 
-    const handleChange = (checked) => {
-        setIsPriority(checked);
-    };
-
-    const handleRegionChange = (event) => {
-        setSelectedRegion(event.target.value);
+    // Generic handleChange function to update healthData
+    const handleChange = (key, value) => {
+        setHealthData(prevData => ({...prevData, [key]: value}));
     };
 
     return (
         <div className={"h-100"}>
             <div className="row text-center align-items-center my-2">
-                <div className="col-1 btn-outline-info btn mx-1"><FaEdit size={"22px"} /> Değiştir</div>
-                <div className="col-1 btn-outline-secondary btn mx-1"><MdOutlineCancelPresentation size={"22px"} /> Vazgeç</div>
-                <div className="col-1 btn-outline-primary btn mx-1 disabled"><VscFolderActive size={"22px"} /> Etkinleştir</div>
-                <div className="col-1 btn-outline-success btn mx-1" onClick={handleSave}>
-                    <MdOutlineSave size={"24px"} /> Kaydet
+                <div className="col-1 btn-outline-info btn mx-1"><FaEdit size={"22px"}/> Değiştir</div>
+                <div className="col-1 btn-outline-secondary btn mx-1"><MdOutlineCancelPresentation
+                    size={"22px"}/> Vazgeç
                 </div>
-                <div className="col-1 btn-outline-danger btn mx-1 disabled"><GiBrain size={"22px"} /> Hatırla</div>
-                <div className="col-2 btn-outline-primary btn mx-1 disabled"><MdOutlineRecycling size={"22px"} /> Mükerrer Kontrolü</div>
+                <div className="col-1 btn-outline-primary btn mx-1 disabled"><VscFolderActive
+                    size={"22px"}/> Etkinleştir
+                </div>
+                <div className="col-1 btn-outline-success btn mx-1" onClick={handleSave}>
+                    <MdOutlineSave size={"24px"}/> Kaydet
+                </div>
+                <div className="col-1 btn-outline-danger btn mx-1 disabled"><GiBrain size={"22px"}/> Hatırla</div>
+                <div className="col-2 btn-outline-primary btn mx-1 disabled"><MdOutlineRecycling
+                    size={"22px"}/> Mükerrer Kontrolü
+                </div>
                 <div className="col-4 mx-1">
                     <select className="form-select" value={selectedOption} onChange={handleSelectChange}>
                         <option value={""}>Seçiniz</option>
@@ -89,14 +97,15 @@ function HealthEvent({ data, onSelectChange }) {
                     </select>
                 </div>
             </div>
-            <div className="row bg-primary-subtle" style={{ height: "40vh" }}>
+            <div className="row bg-primary-subtle" style={{height: "40vh"}}>
                 <div className="col-3 h-100 user-select-none">
-                    <div className="row text-center align-items-center" style={{ border: "1px solid #000000", borderRadius: "8px" }}>
-                        <div className="col" style={{ borderRight: "1px solid #000000" }}>
+                    <div className="row text-center align-items-center"
+                         style={{border: "1px solid #000000", borderRadius: "8px"}}>
+                        <div className="col" style={{borderRight: "1px solid #000000"}}>
                             Vaka Nu : <span className={"nu-format"}> {data?.data?.data?.incidentId} </span>
                         </div>
                         <div className="col">Tarih :
-                            <span className={"nu-format"} style={{ fontSize: "11px" }}>
+                            <span className={"nu-format"} style={{fontSize: "11px"}}>
                                 {addressService.formatTime(data?.data?.data?.createdAt)} {addressService.formatDigitalDate(data?.data?.data?.createdAt)}
                             </span>
                         </div>
@@ -105,8 +114,11 @@ function HealthEvent({ data, onSelectChange }) {
                         <div className="row ms-1">Kurum Görevlendirme Zamanı:</div>
                         <div className="row">
                             <div className="input-group my-2">
-                                <input type="text" className="form-control" placeholder={`${addressService.formatTime(data?.data?.data?.createdAt)} ${addressService.formatDigitalDate(data?.data?.data?.createdAt)}`} aria-label="date time" aria-describedby="button-addon2" disabled={true} />
-                                <button className="btn btn-outline-secondary" type="button" id="button-addon2" disabled={true}><RiMapPinTimeLine size={"20px"} /></button>
+                                <input type="text" className="form-control"
+                                       placeholder={`${addressService.formatTime(data?.data?.data?.createdAt)} ${addressService.formatDigitalDate(data?.data?.data?.createdAt)}`}
+                                       aria-label="date time" aria-describedby="button-addon2" disabled={true}/>
+                                <button className="btn btn-outline-secondary" type="button" id="button-addon2"
+                                        disabled={true}><RiMapPinTimeLine size={"20px"}/></button>
                             </div>
                         </div>
                         <div className="row">
@@ -115,23 +127,27 @@ function HealthEvent({ data, onSelectChange }) {
                                     <input
                                         className="form-check-input"
                                         type="checkbox"
-                                        checked={isPriority}
+                                        checked={healthData.isPriority}
                                         id="priorityCheck"
-                                        onChange={(e) => handleChange(e.target.checked)}
+                                        onChange={(e) => handleChange('isPriority', e.target.checked)}
                                     />
                                     <label className="form-check-label" htmlFor="priorityCheck">
                                         Öncelikli
                                     </label>
                                 </div>
                             </div>
-                            <div className="col-3 bg-danger-subtle" style={{ borderRadius: "10px 0 0 10px" }}>
-                                <input className="form-check-input" type="radio" name="region" id="radioRegionUrban" value="urban" onChange={handleRegionChange} checked={selectedRegion === 'urban'} />
+                            <div className="col-3 bg-danger-subtle" style={{borderRadius: "10px 0 0 10px"}}>
+                                <input className="form-check-input" type="radio" name="region" id="radioRegionUrban"
+                                       value="urban" onChange={(e) => handleChange('selectedRegion', e.target.value)}
+                                       checked={healthData.selectedRegion === 'urban'}/>
                                 <label className="form-check-label" htmlFor="radioRegionUrban">
                                     Kentsel
                                 </label>
                             </div>
-                            <div className="col-3 bg-danger-subtle" style={{ borderRadius: "0 10px 10px 0" }}>
-                                <input className="form-check-input" type="radio" name="region" id="radioRegionRural" value="rural" onChange={handleRegionChange} checked={selectedRegion === 'rural'} />
+                            <div className="col-3 bg-danger-subtle" style={{borderRadius: "0 10px 10px 0"}}>
+                                <input className="form-check-input" type="radio" name="region" id="radioRegionRural"
+                                       value="rural" onChange={(e) => handleChange('selectedRegion', e.target.value)}
+                                       checked={healthData.selectedRegion === 'rural'}/>
                                 <label className="form-check-label" htmlFor="radioRegionRural">
                                     Kırsal
                                 </label>
@@ -140,25 +156,26 @@ function HealthEvent({ data, onSelectChange }) {
                         <div className="row ms-2">Olay Türü</div>
                         <div className="row">
                             <div className="input-group mb-3">
-                                <input type="text" className="form-control" placeholder="Arama..." aria-label="search" aria-describedby="basic-addon1" disabled={true} />
+                                <input type="text" className="form-control" placeholder="Arama..." aria-label="search"
+                                       aria-describedby="basic-addon1" disabled={true}/>
                             </div>
                         </div>
                         <div className="row">
-                            <div className="mb-3 overflow-hidden" style={{ maxHeight: "150px" }}>
+                            <div className="mb-3 overflow-hidden" style={{maxHeight: "150px"}}>
                                 {data?.data?.data?.incidentDefinition?.definition?.split(',').map((line, index) => {
                                     const trimmedLine = line.trim();
                                     return (
                                         <div key={index}>
                                             <b>{trimmedLine}</b>
                                             {data?.data?.data?.incidentDefinition?.subDefinition?.includes(trimmedLine) && (
-                                                <div style={{ marginLeft: "20px" }}>
+                                                <div style={{marginLeft: "20px"}}>
                                                     ==&gt; {data?.data?.data?.incidentDefinition?.subDefinition.split(':')[1].trim()}
                                                 </div>
                                             )}
                                         </div>
                                     );
                                 })}
-                                <br />
+                                <br/>
                             </div>
                         </div>
                     </div>
@@ -168,7 +185,9 @@ function HealthEvent({ data, onSelectChange }) {
                         Olay Tanımı
                         <div className="row">
                             <div className="mb-3">
-                                <input className="form-control" id="definitionInput" value={definition} onChange={(e) => setDefinition(e.target.value)} placeholder={data?.data?.data?.description} />
+                                <input className="form-control" id="definitionInput" value={healthData.definition}
+                                       onChange={(e) => handleChange('definition', e.target.value)}
+                                       placeholder={data?.data?.data?.description}/>
                             </div>
                         </div>
                     </div>
@@ -176,10 +195,9 @@ function HealthEvent({ data, onSelectChange }) {
                         Arayan veya hasta Adı Soyadı
                         <div className="row">
                             <div className="mb-3">
-                                <textarea className="form-control" id="callerNameInput" value={callerName}
-                                          onChange={(e) =>
-                                              setCallerName(e.target.value)}
-                                          style={{ maxHeight: "55px", overflowY: "auto" }}></textarea>
+                                <textarea className="form-control" id="callerNameInput" value={healthData.callerName}
+                                          onChange={(e) => handleChange('callerName', e.target.value)}
+                                          style={{maxHeight: "55px", overflowY: "auto"}}></textarea>
                             </div>
                         </div>
                     </div>
@@ -187,10 +205,10 @@ function HealthEvent({ data, onSelectChange }) {
                         Sağlık Açıklama
                         <div className="row">
                             <div className="mb-3">
-                                <textarea className="form-control" id="healthDescriptionInput" value={healthDescription}
-                                          onChange={(e) =>
-                                              setHealthData({...healthData, healthDescription:e.target.value})}
-                                          style={{ maxHeight: "68px", overflowY: "auto" }}></textarea>
+                                <textarea className="form-control" id="healthDescriptionInput"
+                                          value={healthData.healthDescription}
+                                          onChange={(e) => handleChange('healthDescription', e.target.value)}
+                                          style={{maxHeight: "68px", overflowY: "auto"}}></textarea>
                             </div>
                         </div>
                     </div>
@@ -198,16 +216,18 @@ function HealthEvent({ data, onSelectChange }) {
                         Diğer Kurum Açıklamaları
                         <div className="row">
                             <div className="mb-3">
-                                <textarea className="form-control" id="desc-other-department" readOnly={true} style={{ maxHeight: "55px", overflowY: "auto" }} placeholder={data?.data?.data?.description}></textarea>
+                                <textarea className="form-control" id="desc-other-department" readOnly={true}
+                                          style={{maxHeight: "55px", overflowY: "auto"}}
+                                          placeholder={data?.data?.data?.description}></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="col-2 h-100 p-0 m-0">
-                    <Address data={address} triggerUpdate={trigger} onAddressChange={handleAddressChange} />
+                    <Address data={address} triggerUpdate={trigger} onAddressChange={handleAddressChange}/>
                 </div>
-                <div className="col-2 bg-white h-100 p-0 m-0 user-select-none" style={{ overflow: "hidden" }}>
-                    <CallLogs isSmall={true} number={data?.data?.data} />
+                <div className="col-2 bg-white h-100 p-0 m-0 user-select-none" style={{overflow: "hidden"}}>
+                    <CallLogs isSmall={true} number={data?.data?.data}/>
                 </div>
                 <div className="col-2 user-select-none">
                     <Department
@@ -216,8 +236,8 @@ function HealthEvent({ data, onSelectChange }) {
                     />
                 </div>
             </div>
-            <div className="row overflow-hidden p-0 m-0" style={{ height: "38vh" }}>
-                <DepartmentOperations name={"health"} />
+            <div className="row overflow-hidden p-0 m-0" style={{height: "38vh"}}>
+                <DepartmentOperations name={"health"}/>
             </div>
         </div>
     );
@@ -233,6 +253,7 @@ HealthEvent.propTypes = {
                 incidentId: PropTypes.number,
                 address: PropTypes.object,
                 description: PropTypes.string,
+                calledNumber: PropTypes.string,
                 incidentDefinition: PropTypes.shape({
                     definition: PropTypes.string,
                     subDefinition: PropTypes.string
