@@ -6,6 +6,8 @@ import {useEffect, useState} from "react";
 import {IoIosSave} from "react-icons/io";
 import {RiDeleteBin5Line} from "react-icons/ri";
 import PropTypes from "prop-types";
+import {useDispatch} from "react-redux";
+import {syncHealth} from "../../store/actions/healthActions.js";
 
 const CrewForm = ({crewName, setCrewName, handleSave}) => {
     return (
@@ -190,7 +192,7 @@ const CrewDetails = ({selectedCrewDetails, onSaveTime}) => {
         });
         onSaveTime(data);
     };
-//Bu class içindeyim. Zamanları main componente gönderip kaydedelim. Ayrıca mainComponet(HealthEvent) update işlemleri de yapılacak. 16:30 17.10.2024***
+
     return (
         <div className="col-5 align-items-center overflow-y-auto" style={{fontSize: "12px", height: "90%"}}>
             <div>Ekip Kayıt Bilgileri</div>
@@ -249,7 +251,13 @@ function HealthActive() {
     const [selectedCrew, setSelectedCrew] = useState(null);
     const [selectedCrewDetails, setSelectedCrewDetails] = useState({});
     const [sentData, setSentData] = useState({});
-
+    const dispatch = useDispatch();
+    const [crewData, setCrewData] = useState({
+        id: '',
+        crewTime: '',
+        crewStatus: '',
+        address: data?.address || {}
+    })
     useEffect(() => {
         const difference = Math.max(0, entryKm - exitKm);
         setDiffKm(difference);
@@ -267,6 +275,7 @@ function HealthActive() {
         if (crewName.trim() && !crewList.includes(crewName.trim())) {
             setCrewList(prev => [...prev, crewName.trim()]);
             setCrewName('');
+            dispatch((syncHealth(crewData)))
         }
     };
     const handleCrewClick = (crewName) => {
@@ -289,7 +298,7 @@ function HealthActive() {
 
     const handleSaveOperations = (data) => {
         setSentData(data);
-        console.log("Kaydedilmeye Hazır Data: " + JSON.stringify(data))
+        console.log("Kaydedilmeye Hazır Data: " + JSON.stringify(data,null,2))
     }
 
     return (<div className="d-flex align-items-start w-100 h-100 overflow-hidden">

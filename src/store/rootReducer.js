@@ -1,10 +1,10 @@
 import {combineReducers} from "redux";
 import userReducer from "./reducers/userReducer.js";
-import summaryReducer from "./reducers/setSummaryReducer.js";
+import healthReducer from "./reducers/healthReducer.js";
 
 const rootReducer = combineReducers({
     user: userReducer,
-    summary: summaryReducer
+    health: healthReducer
 })
 
 export default rootReducer;

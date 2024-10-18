@@ -10,6 +10,8 @@ import DepartmentOperations from "./DepartmentOperations.jsx";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import AddressService from "../../services/AddressService.js";
+import {useDispatch, useSelector} from "react-redux";
+import {syncHealth} from "../../store/actions/healthActions.js";
 
 function HealthEvent({ data, onSelectChange }) {
     const [address, setAddress] = useState({});
@@ -21,6 +23,17 @@ function HealthEvent({ data, onSelectChange }) {
     const [callerName, setCallerName] = useState('');
     const [healthDescription, setHealthDescription] = useState('');
     const addressService = new AddressService();
+    const dispatch = useDispatch();
+    const [healthData, setHealthData] = useState({
+        id: data?.data?.data?.id || '',
+        incidentId: data?.data?.data?.incidentId || '',
+        isPriority: data?.data?.data?.isPriority || false,
+        selectedRegion: '',
+        definition: data?.data?.data?.description || '',
+        callerName: '',
+        healthDescription: '',
+        address: data?.data?.data?.address || {}
+    });
 
     useEffect(() => {
         handleAddress();
@@ -41,22 +54,11 @@ function HealthEvent({ data, onSelectChange }) {
     };
 
     const handleAddressChange = (updatedAddress) => {
-        setAddress(updatedAddress);
+        setHealthData({...healthData, address: updatedAddress});
     };
 
     const handleSave = () => {
-        const formData = {
-            id: data?.data?.data?.id,
-            incidentId: data?.data?.data?.incidentId,
-            isPriority,
-            selectedRegion,
-            definition,
-            callerName,
-            healthDescription,
-            address,
-        };
-        console.log("Form verileri: ", JSON.stringify(formData,null,2));
-        console.log("Gelen Veriler: ", JSON.stringify(data,null,2))
+        dispatch(syncHealth(healthData))
         setTrigger(prevState => prevState + 1);
     };
 
@@ -174,7 +176,10 @@ function HealthEvent({ data, onSelectChange }) {
                         Arayan veya hasta Adı Soyadı
                         <div className="row">
                             <div className="mb-3">
-                                <textarea className="form-control" id="callerNameInput" value={callerName} onChange={(e) => setCallerName(e.target.value)} style={{ maxHeight: "55px", overflowY: "auto" }}></textarea>
+                                <textarea className="form-control" id="callerNameInput" value={callerName}
+                                          onChange={(e) =>
+                                              setCallerName(e.target.value)}
+                                          style={{ maxHeight: "55px", overflowY: "auto" }}></textarea>
                             </div>
                         </div>
                     </div>
@@ -182,7 +187,10 @@ function HealthEvent({ data, onSelectChange }) {
                         Sağlık Açıklama
                         <div className="row">
                             <div className="mb-3">
-                                <textarea className="form-control" id="healthDescriptionInput" value={healthDescription} onChange={(e) => setHealthDescription(e.target.value)} style={{ maxHeight: "68px", overflowY: "auto" }}></textarea>
+                                <textarea className="form-control" id="healthDescriptionInput" value={healthDescription}
+                                          onChange={(e) =>
+                                              setHealthData({...healthData, healthDescription:e.target.value})}
+                                          style={{ maxHeight: "68px", overflowY: "auto" }}></textarea>
                             </div>
                         </div>
                     </div>
