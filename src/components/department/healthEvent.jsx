@@ -10,15 +10,19 @@ import DepartmentOperations from "./DepartmentOperations.jsx";
 import {useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import AddressService from "../../services/AddressService.js";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {syncHealth} from "../../store/actions/healthActions.js";
+import IncidentService from "../../services/incidentService.js";
+import store from "../../store/configureStore.js";
 
 function HealthEvent({data, onSelectChange}) {
     const [address, setAddress] = useState({});
     const [trigger, setTrigger] = useState(0);
     const [selectedOption, setSelectedOption] = useState('');
     const addressService = new AddressService();
-    const dispatch= useDispatch();
+    const incidentService = new IncidentService();
+    const dispatch = useDispatch();
+
     const [healthData, setHealthData] = useState({
         id: data?.data?.data?.id || '',
         incidentId: data?.data?.data?.incidentId || '',
@@ -32,7 +36,6 @@ function HealthEvent({data, onSelectChange}) {
         incidentDefinition: data?.data?.data?.incidentDefinition || {},
     });
 
-
     useEffect(() => {
         handleAddress();
     }, []);
@@ -43,31 +46,34 @@ function HealthEvent({data, onSelectChange}) {
             isPriority: data?.data?.data?.isPriority || false
         }));
     }, [data]);
-
     const handleSelectChange = (e) => {
         const value = e.target.value;
         setSelectedOption(value);
         onSelectChange(value);
         setHealthData(prevData => ({...prevData, selectedRegion: value}));
-    };
 
+    };
     const handleAddress = () => {
         setAddress(data?.data?.data?.address);
-    };
 
+    };
     const handleAddressChange = (updatedAddress) => {
         setHealthData(prevData => ({...prevData, address: updatedAddress}));
-    };
 
-    const handleSave = () => {
-        console.log("Gelen Data: " + JSON.stringify(data?.data?.data, null, 2));
-        console.log("***")
-        console.log("Kaydedilcek Veri: " + JSON.stringify(healthData, null, 2));
-        //dispatch(syncHealth(healthData));
+    };
+    const savedStateData = async()=>{
+        await dispatch(syncHealth(healthData))
+    }
+
+    const handleSave = async() => {
         // setTrigger(prevState => prevState + 1);
+        await savedStateData();
+        const getData = store.getState().health.healthProps
+        incidentService.updateForm(getData)
+            .then(() => console.log("Success updated health form"))
+            .catch((error) => console.error("Error updating health form:", error));
     };
 
-    // Generic handleChange function to update healthData
     const handleChange = (key, value) => {
         setHealthData(prevData => ({...prevData, [key]: value}));
     };

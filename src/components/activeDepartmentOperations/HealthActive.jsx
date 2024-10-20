@@ -179,19 +179,19 @@ const CrewDetails = ({selectedCrewDetails}) => {
     };
 
     const handleSaveTimeClick = () => {
-        const crewData = {
+        const crew = {
             name: selectedCrewDetails.name,
             times: {}
         };
         inputFields.forEach(({id}) => {
             const inputElement = document.getElementById(id);
             if (inputElement) {
-                crewData.times[id] = inputElement.value;
+                crew.times[id] = inputElement.value;
             }
         });
 
         //ekip adı ve bilgilerini array olarak kaydedeceğiz. BURADAYIM...
-        dispatch(syncHealth(crewData));
+        dispatch(syncHealth({}, crew));
     };
 
     return (

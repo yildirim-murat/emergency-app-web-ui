@@ -104,4 +104,37 @@ export default class IncidentService {
             }
         })
     }
+
+    async updateForm(data) {
+        // const requestData = {
+        //     incidentId: data.id,
+        //     isPriority: data.isPriority,
+        //     calledNumber: data.calledNumber,
+        //     description: data.description,
+        //     address: {
+        //         province: data.address.province,
+        //         district: data.address.district,
+        //         neighborhood: data.address.neighborhood,
+        //         street: data.address.street,
+        //         latitude: data.address.latitude,
+        //         longitude: data.address.longitude,
+        //         description: data.address.description,
+        //     },
+        //     incidentDefinition: {
+        //         definition: data.definition,
+        //         subDefinition: data.subDefinition,
+        //     },
+        //     crew:data.crew,
+        // }
+        console.log("Updating form: " + JSON.stringify(data,null,2))
+        // await axios.put(`${baseURL}/api/v1/health`, data, {
+        //     headers: {
+        //         "Authorization": `${getToken()}`,
+        //         "accept": "*/*",
+        //         "Content-Type": "application/json",
+        //     }
+        // }).then(()=> console.log("Updating form: ")).catch((error)=> {console.log("Do not form updated: " + error)});
+
+// BURADAYIM: IdeaIntellij HealthController da 46. satırdayız.
+    }
 }
