@@ -10,7 +10,7 @@ import DepartmentOperations from "./DepartmentOperations.jsx";
 import {useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import AddressService from "../../services/AddressService.js";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {syncHealth} from "../../store/actions/healthActions.js";
 import IncidentService from "../../services/incidentService.js";
 import store from "../../store/configureStore.js";
@@ -61,11 +61,11 @@ function HealthEvent({data, onSelectChange}) {
         setHealthData(prevData => ({...prevData, address: updatedAddress}));
 
     };
-    const savedStateData = async()=>{
+    const savedStateData = async () => {
         await dispatch(syncHealth(healthData))
     }
 
-    const handleSave = async() => {
+    const handleSave = async () => {
         // setTrigger(prevState => prevState + 1);
         await savedStateData();
         const getData = store.getState().health.healthProps
@@ -77,7 +77,8 @@ function HealthEvent({data, onSelectChange}) {
     const handleChange = (key, value) => {
         setHealthData(prevData => ({...prevData, [key]: value}));
     };
-
+    console.log("Gelen Data: " + JSON.stringify(data?.data?.data, null, 2));
+    console.log("health Data: " + JSON.stringify(healthData, null, 2));
     return (
         <div className={"h-100"}>
             <div className="row text-center align-items-center my-2">
@@ -144,16 +145,16 @@ function HealthEvent({data, onSelectChange}) {
                             </div>
                             <div className="col-3 bg-danger-subtle" style={{borderRadius: "10px 0 0 10px"}}>
                                 <input className="form-check-input" type="radio" name="region" id="radioRegionUrban"
-                                       value="urban" onChange={(e) => handleChange('selectedRegion', e.target.value)}
-                                       checked={healthData.selectedRegion === 'urban'}/>
+                                       value="false" onChange={(e) => handleChange('selectedRegion', e.target.value)}
+                                       checked={healthData.selectedRegion === false}/>
                                 <label className="form-check-label" htmlFor="radioRegionUrban">
                                     Kentsel
                                 </label>
                             </div>
                             <div className="col-3 bg-danger-subtle" style={{borderRadius: "0 10px 10px 0"}}>
                                 <input className="form-check-input" type="radio" name="region" id="radioRegionRural"
-                                       value="rural" onChange={(e) => handleChange('selectedRegion', e.target.value)}
-                                       checked={healthData.selectedRegion === 'rural'}/>
+                                       value="true" onChange={(e) => handleChange('selectedRegion', e.target.value)}
+                                       checked={healthData.selectedRegion === true}/>
                                 <label className="form-check-label" htmlFor="radioRegionRural">
                                     Kırsal
                                 </label>
@@ -168,19 +169,24 @@ function HealthEvent({data, onSelectChange}) {
                         </div>
                         <div className="row">
                             <div className="mb-3 overflow-hidden" style={{maxHeight: "150px"}}>
-                                {data?.data?.data?.incidentDefinition?.definition?.split(',').map((line, index) => {
-                                    const trimmedLine = line.trim();
-                                    return (
-                                        <div key={index}>
-                                            <b>{trimmedLine}</b>
-                                            {data?.data?.data?.incidentDefinition?.subDefinition?.includes(trimmedLine) && (
-                                                <div style={{marginLeft: "20px"}}>
-                                                    ==&gt; {data?.data?.data?.incidentDefinition?.subDefinition.split(':')[1].trim()}
+                                {data?.data?.data?.incidentDefinition?.definition
+                                    ? data.data.data.incidentDefinition.definition.includes(',')
+                                        ? data.data.data.incidentDefinition.definition.split(',').map((line, index) => {
+                                            const trimmedLine = line.trim();
+                                            return (
+                                                <div key={index}>
+                                                    <b>{trimmedLine}</b>
+                                                    {data?.data?.data?.incidentDefinition?.subDefinition?.includes(trimmedLine) && (
+                                                        <div style={{marginLeft: '20px'}}>
+                                                            ==&gt; {data?.data?.data?.incidentDefinition?.subDefinition.split(':')[1]?.trim()}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+                                            );
+                                        })
+                                        : <div>No valid data available.</div>
+                                    : <div>Data not available.</div>
+                                }
                                 <br/>
                             </div>
                         </div>
