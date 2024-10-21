@@ -8,6 +8,7 @@ import {RiDeleteBin5Line} from "react-icons/ri";
 import PropTypes from "prop-types";
 import {useDispatch} from "react-redux";
 import {syncHealth} from "../../store/actions/healthActions.js";
+import store from "../../store/configureStore.js";
 
 const CrewForm = ({crewName, setCrewName, handleSave}) => {
     return (
@@ -258,6 +259,10 @@ function HealthActive() {
         setDiffKm(difference);
     }, [exitKm, entryKm])
 
+    useEffect(()=>{
+        const crewData = store.getState().health.healthProps.crew;
+        setCrewList(Array.isArray(crewData) ? crewData : []);
+    },[])
     const handleButtonClick = (inputId) => {
         const now = new Date();
         const formattedTime = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;

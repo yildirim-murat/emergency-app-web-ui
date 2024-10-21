@@ -24,33 +24,49 @@ function HealthEvent({data, onSelectChange}) {
     const dispatch = useDispatch();
 
     const [healthData, setHealthData] = useState({
-        id: data?.data?.data?.id || '',
-        incidentId: data?.data?.data?.incidentId || '',
-        isPriority: data?.data?.data?.isPriority || false,
-        calledNumber: data?.data?.data?.calledNumber || "",
-        selectedRegion: '',
-        callerName: '',
-        healthDescription: '',
-        address: data?.data?.data?.address || {},
-        description: data?.data?.data?.description || "",
-        incidentDefinition: data?.data?.data?.incidentDefinition || {},
+        id: "",
+        incidentId: "",
+        isPriority: false,
+        calledNumber: "",
+        regionType: "urban",
+        callerName: "",
+        healthDescription: "",
+        address: {},
+        description: "",
+        incidentDefinition: {},
+        crew: [],
     });
 
     useEffect(() => {
         handleAddress();
     }, []);
 
+
     useEffect(() => {
-        setHealthData(prevData => ({
-            ...prevData,
-            isPriority: data?.data?.data?.isPriority || false
-        }));
+        if (data?.data?.data) {
+            setHealthData(prevData => ({
+                ...prevData,
+                id: data.data.data.id || "",
+                incidentId: data.data.data.incidentId || "",
+                isPriority: data.data.data.isPriority || false,
+                calledNumber: data.data.data.calledNumber || "",
+                regionType: data.data.data.regionType || "urban",
+                callerName: data.data.data.callerName || "",
+                healthDescription: data.data.data.healthDescription || "",
+                address: data.data.data.address || {},
+                description: data.data.data.description || "",
+                incidentDefinition: data.data.data.incidentDefinition || {},
+                crew: data.data.data.crew || [],
+                savedForm: data.data.data.savedOn,
+            }));
+            setAddress(data.data.data.address || {});
+        }
     }, [data]);
     const handleSelectChange = (e) => {
         const value = e.target.value;
         setSelectedOption(value);
         onSelectChange(value);
-        setHealthData(prevData => ({...prevData, selectedRegion: value}));
+        setHealthData(prevData => ({...prevData, regionType: value}));
 
     };
     const handleAddress = () => {
@@ -66,19 +82,41 @@ function HealthEvent({data, onSelectChange}) {
     }
 
     const handleSave = async () => {
-        // setTrigger(prevState => prevState + 1);
         await savedStateData();
-        const getData = store.getState().health.healthProps
-        incidentService.updateForm(getData)
-            .then(() => console.log("Success updated health form"))
-            .catch((error) => console.error("Error updating health form:", error));
+
+        const getData = store.getState().health.healthProps;
+        const data1 = getData.eventData;
+
+        let crew = getData.crew;
+
+        if (!Array.isArray(crew)) {
+            if (typeof crew === 'object' && crew !== null) {
+                crew = [crew];
+            } else {
+                crew = [];
+            }
+        }
+
+        const crewData = crew.map(crewMember => JSON.stringify(crewMember));
+        const updatedData = {
+            ...data1,
+            crew: [...data1.crew, ...crewData]
+        };
+
+
+        try {
+            await incidentService.updateForm(updatedData);
+            console.log("Success updated health form");
+        } catch (error) {
+            console.error("Error updating health form:", error);
+        }
     };
+
 
     const handleChange = (key, value) => {
         setHealthData(prevData => ({...prevData, [key]: value}));
     };
-    console.log("Gelen Data: " + JSON.stringify(data?.data?.data, null, 2));
-    console.log("health Data: " + JSON.stringify(healthData, null, 2));
+
     return (
         <div className={"h-100"}>
             <div className="row text-center align-items-center my-2">
@@ -145,16 +183,16 @@ function HealthEvent({data, onSelectChange}) {
                             </div>
                             <div className="col-3 bg-danger-subtle" style={{borderRadius: "10px 0 0 10px"}}>
                                 <input className="form-check-input" type="radio" name="region" id="radioRegionUrban"
-                                       value="false" onChange={(e) => handleChange('selectedRegion', e.target.value)}
-                                       checked={healthData.selectedRegion === false}/>
+                                       value="urban" onChange={(e) => handleChange('regionType', e.target.value)}
+                                       checked={healthData.regionType === "urban"}/>
                                 <label className="form-check-label" htmlFor="radioRegionUrban">
                                     Kentsel
                                 </label>
                             </div>
                             <div className="col-3 bg-danger-subtle" style={{borderRadius: "0 10px 10px 0"}}>
                                 <input className="form-check-input" type="radio" name="region" id="radioRegionRural"
-                                       value="true" onChange={(e) => handleChange('selectedRegion', e.target.value)}
-                                       checked={healthData.selectedRegion === true}/>
+                                       value="rural" onChange={(e) => handleChange('regionType', e.target.value)}
+                                       checked={healthData.regionType === "rural"}/>
                                 <label className="form-check-label" htmlFor="radioRegionRural">
                                     Kırsal
                                 </label>
@@ -168,7 +206,7 @@ function HealthEvent({data, onSelectChange}) {
                             </div>
                         </div>
                         <div className="row">
-                            <div className="mb-3 overflow-hidden" style={{maxHeight: "150px"}}>
+                            <div className="mb-3 overflow-hidden" style={{maxHeight: "150px", overflowY: "auto"}}>
                                 {data?.data?.data?.incidentDefinition?.definition
                                     ? data.data.data.incidentDefinition.definition.includes(',')
                                         ? data.data.data.incidentDefinition.definition.split(',').map((line, index) => {
@@ -184,7 +222,7 @@ function HealthEvent({data, onSelectChange}) {
                                                 </div>
                                             );
                                         })
-                                        : <div>No valid data available.</div>
+                                        : <div><b>{data.data.data.incidentDefinition.definition}</b></div>
                                     : <div>Data not available.</div>
                                 }
                                 <br/>
@@ -250,6 +288,7 @@ function HealthEvent({data, onSelectChange}) {
             </div>
             <div className="row overflow-hidden p-0 m-0" style={{height: "38vh"}}>
                 <DepartmentOperations name={"health"}/>
+                {/*Buradayım. Department Name dinamik gelecek.*/}
             </div>
         </div>
     );
@@ -266,10 +305,15 @@ HealthEvent.propTypes = {
                 address: PropTypes.object,
                 description: PropTypes.string,
                 calledNumber: PropTypes.string,
+                callerName: PropTypes.string,
+                regionType: PropTypes.string,
+                healthDescription: PropTypes.string,
                 incidentDefinition: PropTypes.shape({
                     definition: PropTypes.string,
                     subDefinition: PropTypes.string
                 }),
+                crew: PropTypes.string,
+                savedOn: PropTypes.string
             }),
             address: PropTypes.object,
             incidentId: PropTypes.string,

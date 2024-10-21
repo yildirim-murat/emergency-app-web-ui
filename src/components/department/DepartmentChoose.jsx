@@ -8,7 +8,6 @@ import DAEMEvent from "./DAEMEvent.jsx";
 import CoastGuardEvent from "./coastGuardEvent.jsx";
 import IncidentService from "../../services/incidentService.js";
 import {useEffect, useState} from "react";
-import {departmentList} from "../../utils/departmentUtils.js";
 
 function DepartmentChoose({id}) {
     const [departmentData, setDepartmentData] = useState(null);
@@ -24,7 +23,7 @@ function DepartmentChoose({id}) {
         async function fetchData() {
             try {
                 //for (const key of Object.keys(departmentList)) {
-                    result = await service.getOneDetailsById("health", id);
+                result = await service.getOneDetailsById("health", id);
                 //}
 
                 setDepartmentData(result);
@@ -34,6 +33,7 @@ function DepartmentChoose({id}) {
                 setLoading(false);
             }
         }
+
         fetchData();
     }, []);
 

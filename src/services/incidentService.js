@@ -106,6 +106,20 @@ export default class IncidentService {
     }
 
     async updateForm(data) {
+
+        console.log(JSON.stringify(data,null,2))
+
+
+
+        // await axios.patch(`${baseURL}/api/v1/health`, {data}, {
+        //     headers: {
+        //         "Authorization": `${getToken()}`,
+        //         "accept": "*/*",
+        //         "Content-Type": "application/json",
+        //     }
+        // }).then(()=> console.log("Updating form")).catch((error)=> {console.error("Do not form updated: " + error)});
+
+
         // const requestData = {
         //     incidentId: data.id,
         //     isPriority: data.isPriority,
@@ -126,14 +140,7 @@ export default class IncidentService {
         //     },
         //     crew:data.crew,
         // }
-        console.log("Updating form: " + JSON.stringify(data,null,2))
-        // await axios.put(`${baseURL}/api/v1/health`, data, {
-        //     headers: {
-        //         "Authorization": `${getToken()}`,
-        //         "accept": "*/*",
-        //         "Content-Type": "application/json",
-        //     }
-        // }).then(()=> console.log("Updating form: ")).catch((error)=> {console.log("Do not form updated: " + error)});
+
 
 // BURADAYIM: IdeaIntellij HealthController da 46. satırdayız.
     }
