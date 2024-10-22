@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import AddressService from "../services/AddressService.js";
 
 function Address({triggerUpdate, data, onAddressChange}) {
@@ -15,6 +15,7 @@ function Address({triggerUpdate, data, onAddressChange}) {
     const [selectedLatitude, setSelectedLatitude] = useState("");
     const [selectedLongitude, setSelectedLongitude] = useState("");
     const [selectedAddressDesc, setSelectedAddressDesc] = useState("");
+    const userInputRef = useRef(false);
 
     useEffect(() => {
         if (data) {
@@ -36,7 +37,9 @@ function Address({triggerUpdate, data, onAddressChange}) {
             if (data.longitude && data.longitude !== selectedLongitude) {
                 setSelectedLongitude(data.longitude);
             }
-            if (data.description && data.description !== selectedAddressDesc) {
+            if (userInputRef.current) {
+                userInputRef.current = false;
+            } else if (data.description && data.description !== selectedAddressDesc) {
                 setSelectedAddressDesc(data.description);
             }
         } else {
@@ -90,8 +93,10 @@ function Address({triggerUpdate, data, onAddressChange}) {
         setSelectedLongitude(e.target.value);
     };
     const handleAddressDescChange = (e) => {
+        userInputRef.current = true
         setSelectedAddressDesc(e.target.value);
         updateAddressCharCount();
+        updateAddress();
     };
     const updateAddress = () => {
         const updatedAddress = {
