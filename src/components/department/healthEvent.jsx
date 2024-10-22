@@ -56,10 +56,24 @@ function HealthEvent({data, onSelectChange}) {
                 address: data.data.data.address || {},
                 description: data.data.data.description || "",
                 incidentDefinition: data.data.data.incidentDefinition || {},
-                crew: data.data.data.crew || [],
+                crewData: data.data.data.crewData || [],
                 savedForm: data.data.data.savedOn,
             }));
             setAddress(data.data.data.address || {});
+
+            dispatch(syncHealth({
+                id: data.data.data.id || "",
+                incidentId: data.data.data.incidentId || "",
+                isPriority: data.data.data.isPriority || false,
+                calledNumber: data.data.data.calledNumber || "",
+                regionType: data.data.data.regionType || "urban",
+                callerName: data.data.data.callerName || "",
+                healthDescription: data.data.data.healthDescription || "",
+                address: data.data.data.address || {},
+                description: data.data.data.description || "",
+                incidentDefinition: data.data.data.incidentDefinition || {},
+                savedForm: data.data.data.savedOn
+            }, data.data.data.crewData))
         }
     }, [data]);
     const handleSelectChange = (e) => {
@@ -83,29 +97,10 @@ function HealthEvent({data, onSelectChange}) {
 
     const handleSave = async () => {
         await savedStateData();
-
         const getData = store.getState().health.healthProps;
-        const data1 = getData.eventData;
-
-        let crew = getData.crew;
-
-        if (!Array.isArray(crew)) {
-            if (typeof crew === 'object' && crew !== null) {
-                crew = [crew];
-            } else {
-                crew = [];
-            }
-        }
-
-        const crewData = crew.map(crewMember => JSON.stringify(crewMember));
-        const updatedData = {
-            ...data1,
-            crew: [...data1.crew, ...crewData]
-        };
-
 
         try {
-            await incidentService.updateForm(updatedData);
+            await incidentService.updateForm(getData);
             console.log("Success updated health form");
         } catch (error) {
             console.error("Error updating health form:", error);
@@ -312,7 +307,7 @@ HealthEvent.propTypes = {
                     definition: PropTypes.string,
                     subDefinition: PropTypes.string
                 }),
-                crew: PropTypes.string,
+                crewData: PropTypes.string,
                 savedOn: PropTypes.string
             }),
             address: PropTypes.object,

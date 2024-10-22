@@ -106,42 +106,12 @@ export default class IncidentService {
     }
 
     async updateForm(data) {
-
-        console.log(JSON.stringify(data,null,2))
-
-
-
-        // await axios.patch(`${baseURL}/api/v1/health`, {data}, {
-        //     headers: {
-        //         "Authorization": `${getToken()}`,
-        //         "accept": "*/*",
-        //         "Content-Type": "application/json",
-        //     }
-        // }).then(()=> console.log("Updating form")).catch((error)=> {console.error("Do not form updated: " + error)});
-
-
-        // const requestData = {
-        //     incidentId: data.id,
-        //     isPriority: data.isPriority,
-        //     calledNumber: data.calledNumber,
-        //     description: data.description,
-        //     address: {
-        //         province: data.address.province,
-        //         district: data.address.district,
-        //         neighborhood: data.address.neighborhood,
-        //         street: data.address.street,
-        //         latitude: data.address.latitude,
-        //         longitude: data.address.longitude,
-        //         description: data.address.description,
-        //     },
-        //     incidentDefinition: {
-        //         definition: data.definition,
-        //         subDefinition: data.subDefinition,
-        //     },
-        //     crew:data.crew,
-        // }
-
-
-// BURADAYIM: IdeaIntellij HealthController da 46. satırdayız.
+        await axios.patch(`${baseURL}/api/v1/health`, {...data?.eventData,crewData:JSON.stringify(data.crewData.crews)}, {
+            headers: {
+                "Authorization": `${getToken()}`,
+                "accept": "*/*",
+                "Content-Type": "application/json",
+            }
+        }).then(()=> console.log("Updating form")).catch((error)=> {console.error("Do not form updated: " + error)});
     }
 }

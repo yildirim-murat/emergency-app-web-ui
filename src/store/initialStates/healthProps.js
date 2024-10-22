@@ -1,6 +1,6 @@
 export const healthProps = {
     eventData: null,
-    crew:{}
+    crewData:[]
 }
 
 export default healthProps
