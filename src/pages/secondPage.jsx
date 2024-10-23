@@ -69,7 +69,7 @@ function SecondPage() {
             for (const name in departmentList) {
                 const data = await fetchData(name);
                 console.log("dataZZ: " + JSON.stringify(data))
-//Buradayım.
+//Buradayım.2024
                 setSummaryData((prevState) => ({
                     ...prevState,
                     [name]: data,
