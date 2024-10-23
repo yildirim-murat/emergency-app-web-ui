@@ -1,8 +1,8 @@
 import SummaryList from "../components/summaryList.jsx";
 import IncidentList from "../components/incidentList.jsx";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import SecondPageOperationsService from "../services/secondPageOperationsService.js";
-import { Client } from "@stomp/stompjs";
+import {Client} from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import PropTypes from "prop-types";
 import {departmentList} from "../utils/departmentUtils.js";
@@ -68,6 +68,8 @@ function SecondPage() {
         const fetchAllData = async () => {
             for (const name in departmentList) {
                 const data = await fetchData(name);
+                console.log("dataZZ: " + JSON.stringify(data))
+
                 setSummaryData((prevState) => ({
                     ...prevState,
                     [name]: data,
@@ -97,7 +99,7 @@ function SecondPage() {
     const departmentData = detailedData[selectedDepartment]?.data?.data || [];
     const departmentAssignedData = assignedData[selectedDepartment]?.data?.data || [];
     return (
-        <div className="d-flex user-select-none" style={{ height: "100vh", flexDirection: "column" }}>
+        <div className="d-flex user-select-none" style={{height: "100vh", flexDirection: "column"}}>
             <nav>
                 <div className="nav nav-tabs" id="nav-tab" role="tablist">
                     <button className="nav-link active" id="nav-incident-list" data-bs-toggle="tab"
@@ -117,7 +119,7 @@ function SecondPage() {
                      tabIndex="0">
                     <select
                         className="form-select"
-                        style={{ width: "150px", margin: "15px 30px" }}
+                        style={{width: "150px", margin: "15px 30px"}}
                         aria-label="Kurum Seçiniz"
                         value={selectedDepartment}
                         onChange={handleSelectChange}
@@ -135,7 +137,8 @@ function SecondPage() {
                             </button>
                             <button className="nav-link" id="nav-profile-tab" data-bs-toggle="tab"
                                     data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile"
-                                    aria-selected="false">Ekip Atanmış (<b>{departmentAssignedData.totalElements || 0}</b>)
+                                    aria-selected="false">Ekip Atanmış
+                                (<b>{departmentAssignedData.totalElements || 0}</b>)
                             </button>
                             <button className="nav-link" id="nav-contact-tab" data-bs-toggle="tab"
                                     data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact"
@@ -151,12 +154,12 @@ function SecondPage() {
                     <div className="tab-content" id="nav-tabContent">
                         <div className="tab-pane fade show active" id="nav-home" role="tabpanel"
                              aria-labelledby="nav-active-tab" tabIndex="0">
-                            <IncidentList data={departmentData.content} />
+                            <IncidentList data={departmentData.content}/>
                         </div>
 
                         <div className="tab-pane fade" id="nav-profile" role="tabpanel"
                              aria-labelledby="nav-profile-tab" tabIndex="0">
-                            <IncidentList data={departmentAssignedData.content} />
+                            <IncidentList data={departmentAssignedData.content}/>
                         </div>
 
                         <div className="tab-pane fade" id="nav-contact" role="tabpanel"
@@ -172,15 +175,16 @@ function SecondPage() {
                 <div className="tab-pane fade d-flex flex-wrap justify-content-center" id="nav-summary"
                      role="tabpanel"
                      aria-labelledby="nav-incident-summary"
-                     tabIndex="0" style={{ height: "90vh", flexGrow: 1 }}>
+                     tabIndex="0" style={{height: "90vh", flexGrow: 1}}>
                     {Object.keys(departmentList).map((key) => (
-                        <SummaryList
-                            key={key}
-                            data={{
-                                summaryData: summaryData[key],
-                                departmentName: departmentList[key]
-                            }}
-                        />
+                        console.log("summaryData: " + JSON.stringify(summaryData))
+                        // <SummaryList
+                        //     key={key}
+                        //     data={{
+                        //         summaryData: summaryData[key],
+                        //         departmentName: departmentList[key]
+                        //     }}
+                        // />
                     ))}
                 </div>
             </div>

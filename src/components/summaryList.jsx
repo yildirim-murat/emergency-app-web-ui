@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import {MdOpenInNew} from "react-icons/md";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Modal} from "react-bootstrap";
 
 function SummaryList({data}) {
@@ -13,6 +13,9 @@ function SummaryList({data}) {
         type: '',
     });
 
+    console.log("DATA: " + JSON.stringify(data))
+
+    useEffect(() => {console.log("DATA: " + JSON.stringify(data))})
     if (!data.summaryData) {
         return <div>Yükleniyor...</div>;
     }
@@ -46,7 +49,7 @@ function SummaryList({data}) {
             <div className="head sticky-top bg-danger" style={{borderRadius: "8px"}}>
                 <div className="head d-flex justify-content-between user-select-none text-white">
                     <div className={"text-uppercase align-content-center fs-4 px-2 "}>{data.departmentName}</div>
-                    <div className={"align-content-center pe-2"}>{data.summaryData.data.data.numberOfElements} vaka
+                    <div className={"align-content-center pe-2"}>5 vaka
                         listelenmektedir
                     </div>
                 </div>
@@ -112,44 +115,44 @@ function SummaryList({data}) {
                 {filteredIncidents
                     .sort((a, b) => a.incidentId - b.incidentId)
                     .map((incident, index) => (
-                    <tr
-                        key={index}
-                        className="user-select-none"
-                        style={{cursor: "pointer"}}
-                        onClick={() => {
-                            setSelectedIncident(incident)
-                        }}
-                    >
-                        <th scope="row" style={{borderRadius: "15px 0 0 15px"}}>
-                            <div className="d-inline-block text-truncate text-center" style={{width: "80px"}}>
-                                {incident.incidentId}
-                            </div>
-                            {selectedIncident === incident && (
-                                <button className="btn btn-danger" onClick={() => openModal(incident)}>
-                                    <MdOpenInNew color="white" size="22px"/>
-                                </button>
-                            )}
-                        </th>
-                        <td style={{height: "60px"}}>
+                        <tr
+                            key={index}
+                            className="user-select-none"
+                            style={{cursor: "pointer"}}
+                            onClick={() => {
+                                setSelectedIncident(incident)
+                            }}
+                        >
+                            <th scope="row" style={{borderRadius: "15px 0 0 15px"}}>
+                                <div className="d-inline-block text-truncate text-center" style={{width: "80px"}}>
+                                    {incident.incidentId}
+                                </div>
+                                {selectedIncident === incident && (
+                                    <button className="btn btn-danger" onClick={() => openModal(incident)}>
+                                        <MdOpenInNew color="white" size="22px"/>
+                                    </button>
+                                )}
+                            </th>
+                            <td style={{height: "60px"}}>
                                 <span className="d-inline-block text-truncate align-content-center"
                                       style={{maxWidth: "100px", height: "100%"}}>
                                     {incident.description}
                                 </span>
-                        </td>
-                        <td style={{height: "60px"}}>
+                            </td>
+                            <td style={{height: "60px"}}>
                                 <span className="d-inline-block text-truncate align-content-center"
                                       style={{maxWidth: "100px", height: "100%"}}>
                                     {incident.address?.district}
                                 </span>
-                        </td>
-                        <td style={{borderRadius: "0 15px 15px 0", height: "60px"}}>
+                            </td>
+                            <td style={{borderRadius: "0 15px 15px 0", height: "60px"}}>
                                 <span className="d-inline-block text-truncate align-content-center"
                                       style={{maxWidth: "100px", height: "100%"}}>
                                     {incident.type}
                                 </span>
-                        </td>
-                    </tr>
-                ))}
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
             <Modal show={isModalOpen} onHide={closeModal}>
@@ -161,7 +164,9 @@ function SummaryList({data}) {
                         <div>
                             <p><strong>Olay Numarası:</strong> {selectedIncident.incidentId} </p>
                             <p><strong>Olay Tanımı:</strong> {selectedIncident.description} </p>
-                            <p><strong>Olay Yeri:</strong> {selectedIncident.address?.province}/{selectedIncident.address?.district} {selectedIncident.address?.neighborhood} {selectedIncident.address?.street}</p>
+                            <p><strong>Olay
+                                Yeri:</strong> {selectedIncident.address?.province}/{selectedIncident.address?.district} {selectedIncident.address?.neighborhood} {selectedIncident.address?.street}
+                            </p>
                             <p><strong>Olay Türü:</strong> {selectedIncident.definition} </p>
                         </div>
                     )}

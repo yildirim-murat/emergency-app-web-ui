@@ -1,10 +1,10 @@
 export const departmentList = {
     "health": "Sağlık",
     "police": "Emniyet",
-    "gendarme": "Jandarma",
-    "fire_department": "İtfaiye",
-    "forestry": "Orman",
-    "daem": "AFAD"
+    // "gendarme": "Jandarma",
+    // "fire_department": "İtfaiye",
+    // "forestry": "Orman",
+    // "daem": "AFAD"
 };
 
 

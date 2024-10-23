@@ -5,6 +5,7 @@ import {getSelectedDepartmentsFromMask} from "../utils/departmentUtils.js";
 const baseURL = "http://localhost:8080";
 
 export default class IncidentService {
+
     create() {
         return axios.post(`${baseURL}/api/v1/incidents`, {}, {
             headers: {
