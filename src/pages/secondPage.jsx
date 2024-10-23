@@ -1,4 +1,3 @@
-import SummaryList from "../components/summaryList.jsx";
 import IncidentList from "../components/incidentList.jsx";
 import {useEffect, useState} from "react";
 import SecondPageOperationsService from "../services/secondPageOperationsService.js";
@@ -6,14 +5,15 @@ import {Client} from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import PropTypes from "prop-types";
 import {departmentList} from "../utils/departmentUtils.js";
+import SummaryList from "../components/summaryList.jsx";
 
 function SecondPage() {
     const [detailedData, setDetailedData] = useState({});
     const [summaryData, setSummaryData] = useState({});
     const [assignedData, setAssignedData] = useState({});
     const service = new SecondPageOperationsService();
-
     const [selectedDepartment, setSelectedDepartment] = useState(Object.keys(departmentList)[0]);
+
     const fetchData = async (name) => {
         try {
             return await service.getData(name);
@@ -66,40 +66,41 @@ function SecondPage() {
     }, []);
     useEffect(() => {
         const fetchAllData = async () => {
-            for (const name in departmentList) {
+            const departments = Object.keys(departmentList);
+            const summaryPromises = departments.map(async (name) => {
                 const data = await fetchData(name);
-                console.log("dataZZ: " + JSON.stringify(data))
-/*
-Şİmdi buradayım. Son hali 2024 10 23 16:47
- */
-                setSummaryData((prevState) => ({
-                    ...prevState,
-                    [name]: data,
-                }));
-
                 const detailData = await fetchDetailData(name);
-                setDetailedData((prevState) => ({
-                    ...prevState,
-                    [name]: detailData,
-                }));
-
                 const assignData = await fetchAssignData(name);
-                setAssignedData((prevState) => ({
-                    ...prevState,
-                    [name]: assignData,
-                }))
+
+                return {
+                    [name]: { data, detailData, assignData }
+                };
+            });
+
+            try {
+                const results = await Promise.all(summaryPromises);
+                results.forEach(result => {
+                    setSummaryData((prevState) => ({
+                        ...prevState,
+                        ...result,
+                    }));
+                });
+                console.log("Data retrieval was successful");
+            } catch (error) {
+                console.error("Data retrieval error encountered: " + error);
             }
         };
 
-        fetchAllData()
-            .then(() => console.log("Data retrieval was successful"))
-            .catch((error) => console.error("Data retrieval error encountered: " + error));
+        fetchAllData();
     }, [messages]);
+
+
     const handleSelectChange = (e) => {
         setSelectedDepartment(e.target.value);
     };
     const departmentData = detailedData[selectedDepartment]?.data?.data || [];
     const departmentAssignedData = assignedData[selectedDepartment]?.data?.data || [];
+
     return (
         <div className="d-flex user-select-none" style={{height: "100vh", flexDirection: "column"}}>
             <nav>
@@ -179,14 +180,13 @@ function SecondPage() {
                      aria-labelledby="nav-incident-summary"
                      tabIndex="0" style={{height: "90vh", flexGrow: 1}}>
                     {Object.keys(departmentList).map((key) => (
-                        console.log("summaryData: " + JSON.stringify(summaryData))
-                        // <SummaryList
-                        //     key={key}
-                        //     data={{
-                        //         summaryData: summaryData[key],
-                        //         departmentName: departmentList[key]
-                        //     }}
-                        // />
+                        <SummaryList
+                            key={key}
+                            data={{
+                                summaryData: summaryData[key],
+                                departmentName: departmentList[key]
+                            }}
+                        />
                     ))}
                 </div>
             </div>

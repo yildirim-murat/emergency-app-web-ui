@@ -13,13 +13,12 @@ function SummaryList({data}) {
         type: '',
     });
 
-    console.log("DATA: " + JSON.stringify(data))
-
     useEffect(() => {console.log("DATA: " + JSON.stringify(data))})
+
     if (!data.summaryData) {
         return <div>Yükleniyor...</div>;
     }
-    const incidents = data.summaryData.data.data.content || [];
+    const incidents = data?.summaryData?.data?.data?.content || [];
     const handleInputChange = (e) => {
         const {id, value} = e.target;
         setFilters((prevFilters) => ({

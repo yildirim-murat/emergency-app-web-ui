@@ -18,6 +18,7 @@ export default class SecondPageOperationsService {
         try {
             const responses = await Promise.all(requests);
             console.log("Veriler başarılı şekilde getirildi.", responses);
+            return responses.map(response => response.data);
         } catch (error) {
             console.log("Hata ile karşılaşıldı: ", error);
         }
