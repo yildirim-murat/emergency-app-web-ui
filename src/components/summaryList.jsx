@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import {MdOpenInNew} from "react-icons/md";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {Modal} from "react-bootstrap";
 
 function SummaryList({data}) {
@@ -12,8 +12,6 @@ function SummaryList({data}) {
         location: '',
         type: '',
     });
-
-    useEffect(() => {console.log("DATA: " + JSON.stringify(data))})
 
     if (!data.summaryData) {
         return <div>Yükleniyor...</div>;
@@ -48,7 +46,8 @@ function SummaryList({data}) {
             <div className="head sticky-top bg-danger" style={{borderRadius: "8px"}}>
                 <div className="head d-flex justify-content-between user-select-none text-white">
                     <div className={"text-uppercase align-content-center fs-4 px-2 "}>{data.departmentName}</div>
-                    <div className={"align-content-center pe-2"}>5 vaka
+                    <div
+                        className={"align-content-center pe-2"}>{data?.summaryData?.data?.data?.totalElements} vaka
                         listelenmektedir
                     </div>
                 </div>

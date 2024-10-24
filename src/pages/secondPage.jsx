@@ -13,32 +13,8 @@ function SecondPage() {
     const [assignedData, setAssignedData] = useState({});
     const service = new SecondPageOperationsService();
     const [selectedDepartment, setSelectedDepartment] = useState(Object.keys(departmentList)[0]);
-
-    const fetchData = async (name) => {
-        try {
-            return await service.getData(name);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            throw error;
-        }
-    };
-    const fetchDetailData = async (name) => {
-        try {
-            return await service.getAllData(name);
-        } catch (error) {
-            console.error("Error fetching detailed data:", error);
-            throw error;
-        }
-    };
-    const fetchAssignData = async (name) => {
-        try {
-            return await service.getDataTeamAssigned(name);
-        } catch (error) {
-            console.error("Error fetching detailed data:", error);
-            throw error;
-        }
-    }
     const [messages, setMessages] = useState([]);
+
     useEffect(() => {
         const stompClient = new Client({
             webSocketFactory: () => new SockJS('http://localhost:8080/websocket'),
@@ -67,24 +43,41 @@ function SecondPage() {
     useEffect(() => {
         const fetchAllData = async () => {
             const departments = Object.keys(departmentList);
-            const summaryPromises = departments.map(async (name) => {
+            const dataPromises = departments.map(async (name) => {
                 const data = await fetchData(name);
                 const detailData = await fetchDetailData(name);
                 const assignData = await fetchAssignData(name);
 
                 return {
-                    [name]: { data, detailData, assignData }
+                    name,
+                    data,
+                    detailData,
+                    assignData
                 };
             });
 
             try {
-                const results = await Promise.all(summaryPromises);
+                const results = await Promise.all(dataPromises);
+
                 results.forEach(result => {
-                    setSummaryData((prevState) => ({
+                    const {name, data, detailData, assignData} = result;
+
+                    setSummaryData(prevState => ({
                         ...prevState,
-                        ...result,
+                        [name]: data
+                    }));
+
+                    setDetailedData(prevState => ({
+                        ...prevState,
+                        [name]: detailData
+                    }));
+
+                    setAssignedData(prevState => ({
+                        ...prevState,
+                        [name]: assignData
                     }));
                 });
+
                 console.log("Data retrieval was successful");
             } catch (error) {
                 console.error("Data retrieval error encountered: " + error);
@@ -94,7 +87,30 @@ function SecondPage() {
         fetchAllData();
     }, [messages]);
 
-
+    const fetchData = async (name) => {
+        try {
+            return await service.getData(name);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            throw error;
+        }
+    };
+    const fetchDetailData = async (name) => {
+        try {
+            return await service.getAllData(name);
+        } catch (error) {
+            console.error("Error fetching detailed data:", error);
+            throw error;
+        }
+    };
+    const fetchAssignData = async (name) => {
+        try {
+            return service.getDataTeamAssigned(name);
+        } catch (error) {
+            console.error("Error fetching assigned data:", error);
+            throw error;
+        }
+    };
     const handleSelectChange = (e) => {
         setSelectedDepartment(e.target.value);
     };

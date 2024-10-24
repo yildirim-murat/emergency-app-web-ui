@@ -22,7 +22,6 @@ function HealthEvent({data, onSelectChange}) {
     const addressService = new AddressService();
     const incidentService = new IncidentService();
     const dispatch = useDispatch();
-
     const [healthData, setHealthData] = useState({
         id: "",
         incidentId: "",
@@ -40,8 +39,6 @@ function HealthEvent({data, onSelectChange}) {
     useEffect(() => {
         handleAddress();
     }, []);
-
-
     useEffect(() => {
         if (data?.data?.data) {
             setHealthData(prevData => ({
@@ -94,7 +91,6 @@ function HealthEvent({data, onSelectChange}) {
     const savedStateData = async () => {
         await dispatch(syncHealth(healthData))
     }
-
     const handleSave = async () => {
         await savedStateData();
         const getData = store.getState().health.healthProps;
@@ -106,8 +102,6 @@ function HealthEvent({data, onSelectChange}) {
             console.error("Error updating health form:", error);
         }
     };
-
-
     const handleChange = (key, value) => {
         setHealthData(prevData => ({...prevData, [key]: value}));
     };
@@ -156,8 +150,8 @@ function HealthEvent({data, onSelectChange}) {
                             <div className="input-group my-2">
                                 <input type="text" className="form-control"
                                        placeholder={`${addressService.formatTime(data?.data?.data?.createdAt)} ${addressService.formatDigitalDate(data?.data?.data?.createdAt)}`}
-                                       aria-label="date time" aria-describedby="button-addon2" disabled={true}/>
-                                <button className="btn btn-outline-secondary" type="button" id="button-addon2"
+                                       aria-label="date time" aria-describedby="check-time1" disabled={true}/>
+                                <button className="btn btn-outline-secondary" type="button" id="check-time1"
                                         disabled={true}><RiMapPinTimeLine size={"20px"}/></button>
                             </div>
                         </div>

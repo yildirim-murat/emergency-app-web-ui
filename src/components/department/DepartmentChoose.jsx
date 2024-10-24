@@ -8,34 +8,50 @@ import DAEMEvent from "./DAEMEvent.jsx";
 import CoastGuardEvent from "./coastGuardEvent.jsx";
 import IncidentService from "../../services/incidentService.js";
 import {useEffect, useState} from "react";
+import {departmentList} from "../../utils/departmentUtils.js";
 
 function DepartmentChoose({id}) {
-    const [departmentData, setDepartmentData] = useState(null);
+    const [departmentData, setDepartmentData] = useState([]);
     const [loading, setLoading] = useState(true);
     const localData = localStorage.getItem("user") || null;
     const data = JSON.parse(localData).data.data.departmentName;
     const service = new IncidentService();
 
-
     useEffect(() => {
-        let result;
-
         async function fetchData() {
-            try {
-                //for (const key of Object.keys(departmentList)) {
-                result = await service.getOneDetailsById("health", id);
-                //}
+            const tempData = {};
+            setLoading(true);
+            /*
+                        try {
+                            for (const key of Object.keys(departmentList)) {
+                                const result = await service.getOneDetailsById(key, id);
+                                console.log("RESSULT: " + JSON.stringify(result?.status) + " ***>> " + data)
+                                tempDataArray.push(result);
+                            }
+                            setDepartmentData(tempDataArray);
+                        } catch (error) {
+                            console.error("Veri çekilirken hata oluştu:", error);
+                        } finally {
+                            setLoading(false);
+                        }
 
-                setDepartmentData(result);
-            } catch (error) {
-                console.error("Veri çekilirken hata oluştu:", error);
-            } finally {
-                setLoading(false);
+             */
+
+            for (const key of Object.keys(departmentList)) {
+                service.getOneDetailsById(key, id)
+                    .then((result) => {
+                        tempData[key] = (result);
+                    })
+                    .finally(() => {
+                        setDepartmentData({...tempData});
+                        setLoading(false)
+                    });
+
             }
         }
 
         fetchData();
-    }, []);
+    }, [id]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -44,7 +60,7 @@ function DepartmentChoose({id}) {
     const selectionBlock = () => null;
 
     if (data === "HEALTH") {
-        return (<HealthEvent data={departmentData} onSelectChange={selectionBlock}/>)
+        return (<HealthEvent data={departmentData["health"]} onSelectChange={selectionBlock}/>)
     } else if (data === "POLICE") {
         return (<PoliceEvent data={departmentData["police"]} onSelectChange={selectionBlock}/>)
     } else if (data === "GENDARME") {
